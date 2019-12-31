@@ -36,6 +36,9 @@ if not os.path.isdir(CONFIGURE_DIR):
 #except:
 #  pass
 
+def get_supported_scm_list():
+  return ['svn', 'git']
+
 def validate_vars(configure_dir):
   if configure_dir == '':
     print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
@@ -90,6 +93,46 @@ def configure(configure_dir):
       yaml_environ_vars_pushed = True
       yaml_load_config(configure_dir, 'config.env.yaml', to_globals = False, to_environ = True,
         search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+
+    # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
+    # what vcs command scripts to generate and where.
+    scm_list = get_supported_scm_list()
+    tmpl_cmdop_files_tuple_list = []
+
+    for scm in scm_list:
+      for key, value in g_yaml_globals.expanded_items():
+        if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
+          scm_token_upper = key[:key.find('.')].upper()
+
+          configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+          if len(configure_relpath) > 0 and configure_relpath != '.':
+            project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
+            is_configure_dir_in_project_path_list = False
+            for project_path in project_path_list:
+              is_configure_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+              if is_configure_dir_in_project_path_list:
+                break
+
+            if not is_configure_dir_in_project_path_list:
+              continue
+
+          for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
+            for file in files:
+              if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
+                 tkl.is_file_path_endswith(file, '.in'):
+                tmpl_cmdop_files_tuple_list.append((scm_token_upper, file, file[:file.rfind('.')].format(HUB = value)))
+            dirs.clear() # not recursively
+
+    # generate vcs command scripts
+    for tmpl_cmdop_files_tuple in tmpl_cmdop_files_tuple_list:
+      scm_token_upper = tmpl_cmdop_files_tuple[0]
+      in_file_name = tmpl_cmdop_files_tuple[1]
+      out_file_name = tmpl_cmdop_files_tuple[2]
+      in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
+      out_file_path = os.path.join(configure_dir, out_file_name).replace('\\', '/')
+      with open(in_file_path, 'rt') as in_file, open(out_file_path, 'wt') as out_file:
+        in_file_content = in_file.read()
+        out_file.write(in_file_content.format(SCM_TOKEN = scm_token_upper))
 
     ret = 0
 

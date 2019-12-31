@@ -7,7 +7,7 @@
 3. FEATURES
 3.1. SVN-to-GIT
 4. PREREQUISITES
-5. INSTALLATION
+5. CONFIGURE
 6. USAGE
 6.1. Mirroring (merging) from SVN to GIT
 7. SSH+SVN/PLINK SETUP
@@ -73,16 +73,16 @@ The default directory structure is this:
   |  +-/<project_group_Xn>
   |
   +-/<project_group_X1_WC_roots>
-  |   |     - The Working Copy root directory for a particular project group.
-  |   |       Stores Working Copies in subdirectories for particular projects
+  |   |     - The working copy root directory for a particular project group.
+  |   |       Stores working copies in subdirectories for particular projects
   |   |       which has repositories in different remote servers.
   |   |
   |   +-/<project_A1_WC_root_SVN_1>
-  |   |     - The Working Copy directory for the respective SVN #1 remote
+  |   |     - The working copy directory for the respective SVN #1 remote
   |   |       server.
   |   |
   |   +-/<project_A1_WC_root_GIT_1>
-  |   |     - The Working Copy directory for the respective GIT #1 remote
+  |   |     - The working copy directory for the respective GIT #1 remote
   |   |        server.
   |   :
   |   :
@@ -106,14 +106,14 @@ levels:
 , where a project is always a leaf but project groups can be nested
 
 The directories contains configuration files with various parameters along with
-parameters which can be passed to the scripts in these directories.
+parameters which can be passed to command scripts in these directories.
 
 The system loads configuration files in directories from the root to the most
 nested directory.
 
 If a variable in a configuration file from nested directory is intersected with
 the same variable in the parent directory, then the value from the nested one
-is used (variable specialization).
+is used instead (variable specialization).
 
 -------------------------------------------------------------------------------
 3. FEATURES
@@ -237,24 +237,34 @@ Temporary dropped usage:
 ** fcache
    - to fix issues from the `fcache execution issues` section.
 
+5. Applications:
+
+* subversion 1.8+
+  https://tortoisesvn.net
+
+* git 2.24+
+  https://git-scm.com
+
 -------------------------------------------------------------------------------
-5. INSTALLATION
+5. CONFIGURE
 -------------------------------------------------------------------------------
-1. run the `configure.bat` script from the root directory or from a
-   subdirectory you going to use.
-2. run the `configure_private.bat` script from the root directory or from a
-   subdirectory you going to use.
-3. edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
-   and change the default directory structure if is required to.
-4. edit the `GIT.USER`/`GIT.EMAIL`/`GIT2.USER`/`GIT2.EMAIL` in respective
-   `config.private.yaml` file to mirror from svn to git under unique account
+1. At first, run the `configure.private.*` script from the root directory.
+2. Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define what and
+   where generate respective command scripts.
+   Edit the reset of variables for correct account values.
+   For example, edit the `GIT.USER`/`GIT.EMAIL`/`GIT2.USER`/`GIT2.EMAIL`
+   variables to mirror from svn to git under an unique account
    (will be showed in a merge info after a merge).
+3. At second, run the `configure.*` script from the root directory or from a
+   subdirectory you are going to use.
+4. Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
+   and change the default working copies directory structure if is required to.
 
 -------------------------------------------------------------------------------
 6. USAGE
 -------------------------------------------------------------------------------
 Any deploy script format:
-  `<HubAbbrivatedName>~<ScmName>~<CommandOperation>.bat`, where:
+  `<HubAbbrivatedName>~<ScmName>~<CommandOperation>.*`, where:
 
   `HubAbbrivatedName` - Hub abbrivated name to run a command for.
   `ScmName`           - Version Source Control service name in a hub.
@@ -303,14 +313,14 @@ Any deploy script format:
 To take changes from the git REMOTE repository, then these scripts must be
 issued:
 
-1. `<HubAbbrivatedName>~git~init` (required only if not inited yet)
-2. `<HubAbbrivatedName>~git~pull`
+1. `<HubAbbrivatedName>~git~init.*` (required only if not inited yet)
+2. `<HubAbbrivatedName>~git~pull.*`
 
 To do a merge from svn REMOTE repository to git REMOTE repository (through
 a LOCAL repository), then these scripts must be issued:
 
-1. `<HubAbbrivatedName>~git~init` (required only if not inited yet)
-2. `<HubAbbrivatedName>~git~push_svn_to_git`
+1. `<HubAbbrivatedName>~git~init.*` (required only if not inited yet)
+2. `<HubAbbrivatedName>~git~push_svn_to_git.*`
 
 -------------------------------------------------------------------------------
 7. SSH+SVN/PLINK SETUP
@@ -337,8 +347,8 @@ which is not fully native):
    urls with the user name inside.
 5. Ensure that all svn working copies and the `externals` properties in them
    contains valid svn repository urls with the `svn+ssh://` prefix. If not then
-   use the `*~svn~relocate` scrtip(s) to switch onto it. Then fix all the rest
-   urls in the `externals` properties, for example, just by remove the url
+   use the `*~svn~relocate.*` scrtip(s) to switch onto it. Then fix all the
+   rest urls in the `externals` properties, for example, just by remove the url
    scheme prefix and leave the `//` prefix instead.
 6. Run the `pageant.exe` in the background with the previously generated
    private key (add it).

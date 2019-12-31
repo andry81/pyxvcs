@@ -34,6 +34,7 @@ call "%%CONTOOLS_ROOT%%\get_datetime.bat"
 set "LOG_FILE_NAME_SUFFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
 
 (
+  echo.^^^>"%PYTHON_EXE_PATH%" "%~dp0configure.xsh" %*
   "%PYTHON_EXE_PATH%" "%~dp0configure.xsh" %*
 ) 2>&1 | "%CONTOOLS_ROOT%\wtee.exe" "%CONFIGURE_DIR%\.log\%~n0.%LOG_FILE_NAME_SUFFIX%.log"
 

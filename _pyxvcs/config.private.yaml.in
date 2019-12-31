@@ -1,3 +1,8 @@
+# DESCRIPTION:
+#   `*.HUB_ABBR` uses to select what template command scripts to use for generation and
+#   `*.PROJECT_PATH_LIST` uses to select where to generate
+#
+
 SVN.HUB_ROOT:     svn.code.sf.net/p
 SVN.HUB_ABBR:     sf
 SVN.USER:         user
@@ -22,3 +27,15 @@ GIT3.REPO_OWNER:  owner
 GIT3.USER:        user
 GIT3.SVNSSH.USER: ${SVN.USER}
 GIT3.EMAIL:       user@mail.com
+
+SVN.PROJECT_PATH_LIST:
+  - project_group/project
+
+GIT.PROJECT_PATH_LIST:
+  - project_group/project
+
+GIT2.PROJECT_PATH_LIST:
+  - project_group/project
+
+GIT3.PROJECT_PATH_LIST:
+  - project_group/project
