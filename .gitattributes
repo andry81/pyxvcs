@@ -21,12 +21,6 @@ _pyxvcs/_common/tmpl/{HUB}~svn~update.bat.in -text
 _pyxvcs/_common/tools/get_datetime.bat -text
 _pyxvcs/_common/tools/load_config.bat -text
 _pyxvcs/_common/tools/wtee.exe -text
-_pyxvcs/bb~git~compare_commits.bat -text
-_pyxvcs/bb~git~fetch.bat -text
-_pyxvcs/bb~git~init.bat -text
-_pyxvcs/bb~git~pull.bat -text
-_pyxvcs/bb~git~push_svn_to_git.bat -text
-_pyxvcs/bb~git~reset.bat -text
 _pyxvcs/config.env.yaml.in -text
 _pyxvcs/config.private.yaml.in -text
 _pyxvcs/config.vars.in -text
