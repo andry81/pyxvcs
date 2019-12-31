@@ -18,7 +18,6 @@ _pyxvcs/bb~git~push_svn_to_git.bat -text
 _pyxvcs/bb~git~reset.bat -text
 _pyxvcs/config.env.yaml.in -text
 _pyxvcs/config.private.yaml.in -text
-_pyxvcs/config.vars -text
 _pyxvcs/config.vars.in -text
 _pyxvcs/config.yaml.in -text
 _pyxvcs/configure.bat -text
