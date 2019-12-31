@@ -1,0 +1,24 @@
+[submodule "_pyxvcs/_common/python_patches"]
+	path = _pyxvcs/_common/python_patches
+	owner = _pyxvcs/_common
+	url = /p/tacklelib/tacklelib/trunk/python_patches
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "_pyxvcs/_common/tools/cmdoplib"]
+	path = _pyxvcs/_common/tools/cmdoplib
+	owner = _pyxvcs/_common/tools
+	url = /p/tacklelib/tacklelib/trunk/python/cmdoplib
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "_pyxvcs/_common/tools/tacklelib"]
+	path = _pyxvcs/_common/tools/tacklelib
+	owner = _pyxvcs/_common/tools
+	url = /p/tacklelib/tacklelib/trunk/python/tacklelib
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir

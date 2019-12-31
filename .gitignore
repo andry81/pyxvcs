@@ -1,0 +1,12 @@
+_pyxvcs/*.lst
+_pyxvcs/*.vars
+_pyxvcs/*.yaml
+_pyxvcs/.log
+_pyxvcs/project_group/*.lst
+_pyxvcs/project_group/*.vars
+_pyxvcs/project_group/*.yaml
+_pyxvcs/project_group/.log
+_pyxvcs/project_group/project/*.lst
+_pyxvcs/project_group/project/*.vars
+_pyxvcs/project_group/project/*.yaml
+_pyxvcs/project_group/project/.log

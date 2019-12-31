@@ -1,0 +1,13 @@
+PROJECT_NAME:                           myproject
+WCROOT_OFFSET:                          ${CONFIGURE_ROOT}/../_${PROJECT_NAME}
+
+PROJECT_REPO1.SVN.REPOROOT:             svn+ssh://${SVN.HUB_ROOT}/project/repo1
+
+PROJECT_REPO1.GIT.ORIGIN:               https://${GIT.HUB_ROOT}/${GIT.REPO_OWNER}/project--repo1.git
+PROJECT_REPO2.GIT.ORIGIN:               https://${GIT.HUB_ROOT}/${GIT.REPO_OWNER}/project--repo2.git
+
+PROJECT_REPO1.GIT2.ORIGIN:              https://${GIT2.HUB_ROOT}/${GIT2.REPO_OWNER}/project-repo1.git
+PROJECT_REPO2.GIT2.ORIGIN:              https://${GIT2.HUB_ROOT}/${GIT2.REPO_OWNER}/project-repo2.git
+
+PROJECT_REPO1.GIT3.ORIGIN:              https://${GIT3.HUB_ROOT}/${GIT3.REPO_OWNER}/project--repo1.git
+PROJECT_REPO2.GIT3.ORIGIN:              https://${GIT3.HUB_ROOT}/${GIT3.REPO_OWNER}/project--repo2.git

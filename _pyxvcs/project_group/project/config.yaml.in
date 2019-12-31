@@ -1,0 +1,6 @@
+SVN.WCROOT_DIR:             sf~svn~project--repo1
+GIT.WCROOT_DIR:             gh~git~project--repo1
+GIT2.WCROOT_DIR:            bb~git~project--repo1
+GIT3.WCROOT_DIR:            gl~git~project--repo1
+
+SVN.CHECKOUT_URL:           ${PROJECT_REPO1.SVN.REPOROOT}/trunk
