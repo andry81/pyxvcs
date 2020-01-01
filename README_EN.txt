@@ -432,6 +432,15 @@ Solution:
 Replace all the backslash characters by forward slash character - `/` or by
 double baskslash character - `\\`.
 
+Issue #3
+
+The `config.private.yaml` contains invalid values or was regenerated to
+default values.
+
+Solution:
+
+Manually edit variables in the file for correct values.
+
 -------------------------------------------------------------------------------
 8.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
        `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `

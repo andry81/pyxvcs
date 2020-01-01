@@ -1,4 +1,7 @@
 2020.01.01:
+* changed: readme update
+
+2020.01.01:
 * fixed: missed to pass parameters through in the `cmdop.xsh` script
 
 2020.01.01:
