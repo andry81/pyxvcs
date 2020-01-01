@@ -1,3 +1,9 @@
+2020.01.01:
+* new: load configuration files from local directory declared in the `LOCAL_CONFIG_DIR_NAME` environment variable
+* new: extracted `configure.vars.*` script to separately generate `config.vars` file has used in other configurations scripts
+* changed: moved the root configuration files into a local directory
+* changed: readme update
+
 2019.12.31:
 * fixed: configure script execution
 * new: vcs command scripts generator in `configure.*` script

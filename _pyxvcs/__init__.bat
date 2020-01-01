@@ -12,9 +12,16 @@ set "CONTOOLS_ROOT=%BASE_SCRIPTS_ROOT%\tools"
 set "TACKLELIB_ROOT=%BASE_SCRIPTS_ROOT%\tools\tacklelib"
 set "CMDOPLIB_ROOT=%BASE_SCRIPTS_ROOT%\tools\cmdoplib"
 
-rem call "%%CONTOOLS_ROOT%%\load_config.bat" "%%CONFIGURE_ROOT%%" "config.private.vars" || exit /b
-call "%%CONTOOLS_ROOT%%\load_config.bat" "%%CONFIGURE_ROOT%%" "config.vars" || exit /b
+for %%i in ("%CONFIGURE_ROOT%/%LOCAL_CONFIG_DIR_NAME%" "%CONFIGURE_ROOT%") do ( call :LOAD_CONFIG %%i || exit /b )
 
 if defined CHCP chcp %CHCP%
 
 set __BASE_INIT__=1
+
+exit /b
+
+:LOAD_CONFIG
+rem if exist "%~1/config.private.vars" ( call "%%CONTOOLS_ROOT%%\load_config.bat" %%1 "config.private.vars" || exit /b )
+if exist "%~1/config.vars" ( call "%%CONTOOLS_ROOT%%\load_config.bat" %%1 "config.vars" || exit /b )
+
+exit /b 0

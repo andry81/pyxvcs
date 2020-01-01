@@ -4,6 +4,9 @@ _pyxvcs/*.yaml
 _pyxvcs/*~*~*.bat
 _pyxvcs/*~*~*.sh
 _pyxvcs/.log
+_pyxvcs/_config/*.lst
+_pyxvcs/_config/*.vars
+_pyxvcs/_config/*.yaml
 _pyxvcs/project_group/*.lst
 _pyxvcs/project_group/*.vars
 _pyxvcs/project_group/*.yaml

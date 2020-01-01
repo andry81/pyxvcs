@@ -91,23 +91,28 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     configure_dir, hub_abbr, scm_type = validate_vars(configure_dir, scm_token)
 
-    # loads `config.yaml` from `configure_dir`
+    # load at first from a local config directory
     yaml_global_vars_pushed = False
-    if os.path.isfile(configure_dir + '/config.yaml.in'):
-      # save all old variable values and remember all newly added variables as a new stack record
-      yaml_push_global_vars()
-      yaml_global_vars_pushed = True
-      yaml_load_config(configure_dir, 'config.yaml', to_globals = True, to_environ = False,
-        search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
-
-    # loads `config.env.yaml` from `configure_dir`
     yaml_environ_vars_pushed = False
-    if os.path.isfile(configure_dir + '/config.env.yaml.in'):
-      # save all old variable values and remember all newly added variables as a new stack record
-      yaml_push_environ_vars()
-      yaml_environ_vars_pushed = True
-      yaml_load_config(configure_dir, 'config.env.yaml', to_globals = False, to_environ = True,
-        search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+    for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
+      if not os.path.exists(config_dir):
+        continue
+
+      if os.path.isfile(config_dir + '/config.yaml.in'):
+        # save all old variable values and remember all newly added variables as a new stack record
+        if not yaml_global_vars_pushed:
+          yaml_push_global_vars()
+          yaml_global_vars_pushed = True
+        yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
+          search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+
+      if os.path.isfile(config_dir + '/config.env.yaml.in'):
+        # save all old variable values and remember all newly added variables as a new stack record
+        if not yaml_environ_vars_pushed:
+          yaml_push_environ_vars()
+          yaml_environ_vars_pushed = True
+        yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
+          search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
     ret = 0
 
@@ -221,25 +226,45 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
 
     # load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
     if num_comps > 1:
-      if os.path.exists(configure_root + '/config.yaml.in'):
-        yaml_load_config(configure_root, 'config.yaml', to_globals = True, to_environ = False,
-          search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+      for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
+        if not os.path.exists(config_dir):
+          continue
+
+        if os.path.exists(config_dir + '/config.yaml.in'):
+          yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
+            search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+
       for i in range(num_comps-1):
         configure_parent_dir = os.path.join(configure_root, *configure_relpath_comps[:i+1]).replace('\\', '/')
-        if os.path.exists(configure_parent_dir + '/config.yaml.in'):
-          yaml_load_config(configure_parent_dir, 'config.yaml', to_globals = True, to_environ = False,
-            search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+
+        for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
+          if not os.path.exists(config_dir):
+            continue
+
+          if os.path.exists(config_dir + '/config.yaml.in'):
+            yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
+              search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
 
     # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
     if num_comps > 1:
-      if os.path.exists(configure_root + '/config.env.yaml.in'):
-        yaml_load_config(configure_root, 'config.env.yaml', to_globals = False, to_environ = True,
-          search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+      for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
+        if not os.path.exists(config_dir):
+          continue
+
+        if os.path.exists(config_dir + '/config.env.yaml.in'):
+          yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
+            search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+
       for i in range(num_comps-1):
         configure_parent_dir = os.path.join(configure_root, *configure_relpath_comps[:i+1]).replace('\\', '/')
-        if os.path.exists(configure_parent_dir + '/config.env.yaml.in'):
-          yaml_load_config(configure_parent_dir, 'config.env.yaml', to_globals = False, to_environ = True,
-            search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+
+        for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
+          if not os.path.exists(config_dir):
+            continue
+
+          if os.path.exists(config_dir + '/config.env.yaml.in'):
+            yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
+              search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
     dir_files_wo_ext = [os.path.splitext(f)[0] for f in os.listdir(configure_dir) if os.path.isfile(f)]
     cmd_file = hub_abbr + '~' + scm_type + '~' + cmd_token

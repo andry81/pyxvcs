@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.12.31
+* 2020.01.01
 * pyxvcs
 
 1. DESCRIPTION
@@ -248,16 +248,18 @@ Temporary dropped usage:
 -------------------------------------------------------------------------------
 5. CONFIGURE
 -------------------------------------------------------------------------------
-1. At first, run the `configure.private.*` script from the root directory.
-2. Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define what and
+1. Run the `configure.vars.*` script from the root directory.
+   Edit `config.vars` variables for correct values.
+2. Run the `configure.private.*` script from the root directory.
+ . Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define what and
    where generate respective command scripts.
    Edit the reset of variables for correct account values.
    For example, edit the `GIT.USER`/`GIT.EMAIL`/`GIT2.USER`/`GIT2.EMAIL`
    variables to mirror from svn to git under an unique account
    (will be showed in a merge info after a merge).
-3. At second, run the `configure.*` script from the root directory or from a
+3. Run the `configure.*` script from the root directory or from a
    subdirectory you are going to use.
-4. Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
+   Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
    and change the default working copies directory structure if is required to.
 
 -------------------------------------------------------------------------------
