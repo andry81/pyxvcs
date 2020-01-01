@@ -1,4 +1,7 @@
 2020.01.01:
+* fixed: `LOCAL_CONFIG_DIR_NAME` variable must be declared before call to `configure.vars.*` script
+
+2020.01.01:
 * new: load configuration files from local directory declared in the `LOCAL_CONFIG_DIR_NAME` environment variable
 * new: extracted `configure.vars.*` script to separately generate `config.vars` file has used in other configurations scripts
 * changed: moved the root configuration files into a local directory
