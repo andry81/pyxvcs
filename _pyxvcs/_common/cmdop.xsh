@@ -195,7 +195,13 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
         #   os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in'))):
         #  continue
         if os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in')):
-          ret = cmdop(os.path.join(dirpath, dir).replace('\\', '/'), scm_token, cmd_token, bare_args)
+          ret = cmdop(os.path.join(dirpath, dir).replace('\\', '/'), scm_token, cmd_token, bare_args,
+            git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
+            compare_remote_name = compare_remote_name, compare_svn_rev = compare_svn_rev,
+            root_only = root_only, reset_hard = reset_hard,
+            remove_svn_on_reset = remove_svn_on_reset, cleanup_on_reset = cleanup_on_reset, cleanup_on_compare = cleanup_on_compare,
+            verbosity = verbosity, prune_empty_git_svn_commits = prune_empty_git_svn_commits,
+            retain_commmit_git_svn_parents = retain_commmit_git_svn_parents)
       dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:

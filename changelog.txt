@@ -1,4 +1,7 @@
 2020.01.01:
+* fixed: missed to pass parameters through in the `cmdop.xsh` script
+
+2020.01.01:
 * changed: cut out the history of the changelog file before the 2019.12.31 as a part of another project and is moved it into that project
 
 2020.01.01:
