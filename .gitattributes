@@ -9,6 +9,9 @@ _pyxvcs/_common/cmdop.py.bat -text
 _pyxvcs/_common/cmdop.xsh -text
 _pyxvcs/_common/configure.py.bat -text
 _pyxvcs/_common/configure.xsh -text
+_pyxvcs/_common/tmpl/__init__.bat.in -text
+_pyxvcs/_common/tmpl/configure.bat.in -text
+_pyxvcs/_common/tmpl/configure.yaml.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~git~compare_commits.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~git~fetch.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~git~init.bat.in -text
@@ -28,12 +31,9 @@ _pyxvcs/_config/config.yaml.in -text
 _pyxvcs/configure.bat -text
 _pyxvcs/configure.private.bat -text
 _pyxvcs/configure.vars.bat -text
+_pyxvcs/configure.yaml.bat -text
 _pyxvcs/install_python_modules.bat -text
-_pyxvcs/project_group/__init__.bat -text
 _pyxvcs/project_group/config.yaml.in -text
-_pyxvcs/project_group/configure.bat -text
-_pyxvcs/project_group/project/__init__.bat -text
 _pyxvcs/project_group/project/config.yaml.in -text
-_pyxvcs/project_group/project/configure.bat -text
 _pyxvcs/project_group/project/git_repos.lst.in -text
 /changelog.txt -text

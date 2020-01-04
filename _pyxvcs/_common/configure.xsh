@@ -1,4 +1,4 @@
-import os, sys, shutil, inspect
+import os, sys, shutil, inspect, argparse
 #from datetime import datetime
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
@@ -53,7 +53,7 @@ def validate_vars(configure_dir):
 
   return (configure_dir)
 
-def configure(configure_dir):
+def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repos_list = True, generate_scripts = True):
   print("configure: entering `{0}`".format(configure_dir))
 
   with tkl.OnExit(lambda: print("configure: leaving `{0}`\n---".format(configure_dir))):
@@ -68,12 +68,14 @@ def configure(configure_dir):
       for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
         if not os.path.exists(config_dir):
           continue
-        if os.path.isfile(os.path.join(config_dir, 'git_repos.lst.in')):
-          shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst')),
-        if os.path.isfile(os.path.join(config_dir, 'config.yaml.in')):
-          shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml')),
-        if os.path.isfile(os.path.join(config_dir, 'config.env.yaml.in')):
-          shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml')),
+        if generate_git_repos_list:
+          if os.path.isfile(os.path.join(config_dir, 'git_repos.lst.in')):
+            shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst')),
+        if generate_yaml:
+          if os.path.isfile(os.path.join(config_dir, 'config.yaml.in')):
+            shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml')),
+          if os.path.isfile(os.path.join(config_dir, 'config.env.yaml.in')):
+            shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml')),
     except:
       # `exit` with the parentheses to workaround the issue:
       # `source` xsh file with try/except does hang`:
@@ -103,45 +105,52 @@ def configure(configure_dir):
         yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
           search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-    # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
-    # what vcs command scripts to generate and where.
-    scm_list = get_supported_scm_list()
-    tmpl_cmdop_files_tuple_list = []
+    if generate_scripts:
+      # except the root, where is has to exist separately
+      if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
+        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
+        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.bat.in'), os.path.join(configure_dir, 'configure.bat'))
+        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.yaml.bat.in'), os.path.join(configure_dir, 'configure.yaml.bat'))
 
-    for scm in scm_list:
-      for key, value in g_yaml_globals.expanded_items():
-        if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
-          scm_token_upper = key[:key.find('.')].upper()
+      # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
+      # what vcs command scripts to generate and where.
+      scm_list = get_supported_scm_list()
+      tmpl_cmdop_files_tuple_list = []
 
-          configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
-          if len(configure_relpath) > 0 and configure_relpath != '.':
-            project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
-            is_configure_dir_in_project_path_list = False
-            for project_path in project_path_list:
-              is_configure_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
-              if is_configure_dir_in_project_path_list:
-                break
+      for scm in scm_list:
+        for key, value in g_yaml_globals.expanded_items():
+          if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
+            scm_token_upper = key[:key.find('.')].upper()
 
-            if not is_configure_dir_in_project_path_list:
-              continue
+            configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+            if len(configure_relpath) > 0 and configure_relpath != '.':
+              project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
+              is_configure_dir_in_project_path_list = False
+              for project_path in project_path_list:
+                is_configure_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+                if is_configure_dir_in_project_path_list:
+                  break
 
-          for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
-            for file in files:
-              if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
-                 tkl.is_file_path_endswith(file, '.in'):
-                tmpl_cmdop_files_tuple_list.append((scm_token_upper, file, file[:file.rfind('.')].format(HUB = value)))
-            dirs.clear() # not recursively
+              if not is_configure_dir_in_project_path_list:
+                continue
 
-    # generate vcs command scripts
-    for tmpl_cmdop_files_tuple in tmpl_cmdop_files_tuple_list:
-      scm_token_upper = tmpl_cmdop_files_tuple[0]
-      in_file_name = tmpl_cmdop_files_tuple[1]
-      out_file_name = tmpl_cmdop_files_tuple[2]
-      in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
-      out_file_path = os.path.join(configure_dir, out_file_name).replace('\\', '/')
-      with open(in_file_path, 'rt') as in_file, open(out_file_path, 'wt') as out_file:
-        in_file_content = in_file.read()
-        out_file.write(in_file_content.format(SCM_TOKEN = scm_token_upper))
+            for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
+              for file in files:
+                if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
+                   tkl.is_file_path_endswith(file, '.in'):
+                  tmpl_cmdop_files_tuple_list.append((scm_token_upper, file, file[:file.rfind('.')].format(HUB = value)))
+              dirs.clear() # not recursively
+
+      # generate vcs command scripts
+      for tmpl_cmdop_files_tuple in tmpl_cmdop_files_tuple_list:
+        scm_token_upper = tmpl_cmdop_files_tuple[0]
+        in_file_name = tmpl_cmdop_files_tuple[1]
+        out_file_name = tmpl_cmdop_files_tuple[2]
+        in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
+        out_file_path = os.path.join(configure_dir, out_file_name).replace('\\', '/')
+        with open(in_file_path, 'rt') as in_file, open(out_file_path, 'wt') as out_file:
+          in_file_content = in_file.read()
+          out_file.write(in_file_content.format(SCM_TOKEN = scm_token_upper))
 
     ret = 0
 
@@ -151,14 +160,17 @@ def configure(configure_dir):
         if str(dir)[0:1] == '.':
           continue
         # ignore common directories
-        if str(dir) in ['_common']:
+        if str(dir) in ['_common', LOCAL_CONFIG_DIR_NAME]:
           continue
         ## ignore directories w/o config.vars.in and config.yaml.in files
         #if not (os.path.isfile(os.path.join(dirpath, dir, 'config.vars.in')) and
         #   os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in'))):
         #  continue
         if os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in')):
-          ret = configure(os.path.join(dirpath, dir).replace('\\', '/'))
+          ret = configure(os.path.join(dirpath, dir).replace('\\', '/'), bare_args,
+            generate_yaml = generate_yaml,
+            generate_git_repos_list = generate_git_repos_list,
+            generate_scripts = generate_scripts)
       dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:
@@ -179,7 +191,7 @@ def on_main_exit():
       print(registered_ignored_error[1])
       print('---')
 
-def main(configure_root, configure_dir):
+def main(configure_root, configure_dir, bare_args, **kwargs):
   with tkl.OnExit(on_main_exit):
     configure_dir = validate_vars(configure_dir)
 
@@ -229,7 +241,7 @@ def main(configure_root, configure_dir):
             yaml_load_config(config_dir , 'config.env.yaml', to_globals = False, to_environ = True,
               search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-    configure(configure_dir)
+    configure(configure_dir, bare_args, **kwargs)
 
 # CAUTION:
 #   Temporary disabled because of issues in the python xonsh module.
@@ -241,4 +253,23 @@ def main(configure_root, configure_dir):
 #   Logging is implemented externally to the python.
 #
 if __name__ == '__main__':
-  main(CONFIGURE_ROOT, CONFIGURE_DIR)
+  # parse arguments
+  arg_parser = argparse.ArgumentParser()
+  arg_parser.add_argument('--gen_yaml', action = 'store_true')                  # generate public `*.yaml` scripts, except `*.private.yaml` scripts
+  arg_parser.add_argument('--gen_git_repos_list', action = 'store_true')        # generate `git_repos.lst` configuration files
+  arg_parser.add_argument('--gen_scripts', action = 'store_true')               # generate command script files
+
+  known_args, unknown_args = arg_parser.parse_known_args(sys.argv[2:])
+
+  for unknown_arg in unknown_args:
+    unknown_arg = unknown_arg.lstrip('-')
+    for known_arg in vars(known_args).keys():
+      if unknown_arg.startswith(known_arg):
+        raise Exception('frontend argument is unsafely intersected with the backend argument, you should use an unique name to avoid that: frontrend=`{0}` backend=`{1}`'.format(known_arg, unknown_arg))
+
+  main(
+    CONFIGURE_ROOT, CONFIGURE_DIR, unknown_args,
+    generate_yaml = known_args.gen_yaml,
+    generate_git_repos_list = known_args.gen_git_repos_list,
+    generate_scripts = known_args.gen_scripts
+  )

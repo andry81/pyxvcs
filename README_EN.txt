@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.01.01
+* 2020.01.04
 * pyxvcs
 
 1. DESCRIPTION
@@ -33,7 +33,7 @@
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-Python-based X-ross Version Control System.
+Python-based X-ross Version Control System (svn2git).
 
 Uses set of scripts with predefined format and parameters to represent the
 access to a particular SVN or GIT repository irrespective to the OS.
@@ -121,7 +121,7 @@ is used instead (variable specialization).
 
 Currently only several limited features is suppported:
 
-* one-way limited conversion from svn to git
+* one-way limited conversion from svn to git (svn2git)
 * svn/git basic commands in a project group context
 * one script per a command in a repository
 
@@ -251,16 +251,25 @@ Temporary dropped usage:
 1. Run the `configure.vars.*` script from the root directory.
    Edit `config.vars` variables for correct values.
 2. Run the `configure.private.*` script from the root directory.
- . Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define what and
-   where generate respective command scripts.
+ . Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define how and
+   where to generate respective command scripts.
    Edit the reset of variables for correct account values.
    For example, edit the `GIT.USER`/`GIT.EMAIL`/`GIT2.USER`/`GIT2.EMAIL`
    variables to mirror from svn to git under an unique account
    (will be showed in a merge info after a merge).
-3. Run the `configure.*` script from the root directory or from a
+   Edit all other variables from the `config.private.yaml` file.
+3. Run the `configure.yaml.*` script from the root directory or from a
    subdirectory you are going to use.
+   Edit `SVN_SSH_ENABLED` and `GIT_SSH_ENABLED` variables to properly
+   enable/disable ssh protocol usage from the svn/git utilities.
+   Edit `SVN_SSH_AGENT`, `GIT_SSH_AGENT`, `GIT_SVN_SSH_AGENT` variables related
+   to the ssh protocol.
    Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
    and change the default working copies directory structure if is required to.
+   Edit all other variables in `config.yaml` and `config.env.yaml` files.
+4. Run the `configure.*` script from the root directory or from a
+   subdirectory you are going to use to generate `git_repos.lst` configuration
+   file and all the command scripts altogether recursively.
 
 -------------------------------------------------------------------------------
 6. USAGE

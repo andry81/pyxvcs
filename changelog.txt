@@ -1,3 +1,10 @@
+2020.01.04:
+* fixed: mutiple fixes with configuration generation
+* new: added `configure.yaml.*` script to separately generate yaml configuration files from templates, `configure.*` now generates only `git_repos.lst` file and command scripts from the template directory
+* changed: _common/tmpl: added `__init__.*`, `configure.*` and `configure.yaml.*` as part of all command scripts except the root, removed them from all children directories
+* changed: _common: added respective parameters to call inner functions
+* changed: readme update
+
 2020.01.01:
 * changed: readme update
 
