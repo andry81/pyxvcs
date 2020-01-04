@@ -37,3 +37,4 @@ _pyxvcs/project_group/config.yaml.in -text
 _pyxvcs/project_group/project/config.yaml.in -text
 _pyxvcs/project_group/project/git_repos.lst.in -text
 /changelog.txt -text
+/license.txt -text

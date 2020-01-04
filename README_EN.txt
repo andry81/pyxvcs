@@ -3,32 +3,34 @@
 * pyxvcs
 
 1. DESCRIPTION
-2. DIRECTORY DEPLOY STRUCTURE
-3. FEATURES
-3.1. SVN-to-GIT
+2. LICENSE
+3. REPOSITORIES
 4. PREREQUISITES
-5. CONFIGURE
-6. USAGE
-6.1. Mirroring (merging) from SVN to GIT
-7. SSH+SVN/PLINK SETUP
-8. KNOWN ISSUES
-8.1. svn+ssh issues
-8.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
-       `svn: E170012: Can't create tunnel`
-8.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
-       `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
-       `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
-8.1.3. Message `Keyboard-interactive authentication prompts from server:`
-       `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
-       `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
-       `svn: E210002: Network connection closed unexpectedly`
-8.2. Python execution issues
-8.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
-       `python_tests`
-8.2.2. `OSError: [WinError 6] The handle is invalid`
-8.3. pytest execution issues
-8.4. fcache execution issues
-9. AUTHOR EMAIL
+5. CATALOG CONTENT DESCRIPTION
+6. FEATURES
+6.1. SVN-to-GIT
+7. CONFIGURE
+8. USAGE
+8.1. Mirroring (merging) from SVN to GIT
+9. SSH+SVN/PLINK SETUP
+10. KNOWN ISSUES
+10.1. svn+ssh issues
+10.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+        `svn: E170012: Can't create tunnel`
+10.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+        `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
+        `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
+10.1.3. Message `Keyboard-interactive authentication prompts from server:`
+        `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+        `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
+        `svn: E210002: Network connection closed unexpectedly`
+10.2. Python execution issues
+10.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
+        `python_tests`
+10.2.2. `OSError: [WinError 6] The handle is invalid`
+10.3. pytest execution issues
+10.4. fcache execution issues
+11. AUTHOR EMAIL
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -42,9 +44,101 @@ NOTE:
   The project is experimental and only the Windows is supported.
 
 -------------------------------------------------------------------------------
-2. DIRECTORY DEPLOY STRUCTURE
+2. LICENSE
 -------------------------------------------------------------------------------
-The default directory structure is this:
+The MIT license (see included text file "license.txt" or
+https://en.wikipedia.org/wiki/MIT_License)
+
+-------------------------------------------------------------------------------
+3. REPOSITORIES
+-------------------------------------------------------------------------------
+Primary:
+  * https://sf.net/p/pyxvcs/pyxvcs/HEAD/tree/trunk
+  * https://svn.code.sf.net/p/pyxvcs/pyxvcs/trunk
+First mirror:
+  * https://github.com/andry81/pyxvcs/tree/trunk
+  * https://github.com/andry81/pyxvcs.git
+Second mirror:
+  * https://bitbucket.org/andry81/pyxvcs/src/trunk
+  * https://bitbucket.org/andry81/pyxvcs.git
+
+-------------------------------------------------------------------------------
+4. PREREQUISITES
+-------------------------------------------------------------------------------
+
+Currently tested these set of OS platforms, interpreters and modules to run
+from:
+
+1. OS platforms.
+
+* Windows 7 (`.bat` only)
+
+2. Interpreters:
+
+* python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
+  https://python.org
+  - standard implementation to run python scripts
+  - 3.7.4 has a bug in the `pytest` module execution, see `KNOWN ISSUES`
+    section
+  - 3.5+ is required for the direct import by a file path (with any extension)
+    as noted in the documentation:
+    https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+
+3. Modules
+
+* Python site modules:
+
+**  xonsh/0.9.12
+    https://github.com/xonsh/xonsh
+    - to run python scripts and import python modules with `.xsh` file
+      extension
+**  plumbum 1.6.7
+    https://plumbum.readthedocs.io/en/latest/
+    - to run python scripts in a shell like environment
+**  win_unicode_console
+    - to enable unicode symbols support in the Windows console
+**  pyyaml 5.1.1
+    - to read yaml format files (.yaml, .yml)
+**  conditional 1.3
+    - to support conditional `with` statements
+**  fcache 0.4.7
+    - for local cache storage for python scripts
+**  psutil 5.6.7
+    - for processes list request
+**  tzlocal 2.0.0
+    - for local timezone request
+
+Temporary dropped usage:
+
+**  prompt-toolkit 2.0.9
+    - optional dependency to the Xonsh on the Windows
+**  cmdix 0.2.0
+    https://github.com/jaraco/cmdix
+    - extension to use Unix core utils within Python environment as plain
+      executable or python function
+
+4. Patches:
+
+* Python site modules contains patches in the `python_patches` directory:
+
+** fcache
+   - to fix issues from the `fcache execution issues` section.
+
+5. Applications:
+
+* subversion 1.8+
+  https://tortoisesvn.net
+  - to run svn client
+
+* git 2.24+
+  https://git-scm.com
+  - to run git client
+
+-------------------------------------------------------------------------------
+5. CATALOG CONTENT DESCRIPTION
+-------------------------------------------------------------------------------
+
+The example directory structure is this:
 
 /<root>
   |
@@ -116,7 +210,7 @@ the same variable in the parent directory, then the value from the nested one
 is used instead (variable specialization).
 
 -------------------------------------------------------------------------------
-3. FEATURES
+6. FEATURES
 -------------------------------------------------------------------------------
 
 Currently only several limited features is suppported:
@@ -126,7 +220,7 @@ Currently only several limited features is suppported:
 * one script per a command in a repository
 
 -------------------------------------------------------------------------------
-3.1. SVN-to-GIT
+6.1. SVN-to-GIT
 -------------------------------------------------------------------------------
 
 Pros:
@@ -152,12 +246,12 @@ Pros:
 * author name, email and date applies in a `git commit ...` call instead of in
   a `git svn fetch ...` call, so the originally fetched git-svn commits can be
   parents to a local merge commit as is
-  (disabled by default, see the flag `--retain_commmit_git_svn_parents`).
+  (disabled by default, see the flag `--retain_commit_git_svn_parents`).
 * built-in support of `svn+ssh` protocol through the `ssh-pageant` utility.
 * all empty directories in an svn repository can be translated into git
-  repository(ies) through an empty file
-* automatic log of any script in the `pyxvcs` directory through the stdout
-  redirection to an external utility.
+  repository(ies) through an empty file.
+* automatic log of almost all scripts in the `pyxvcs` directory through the
+  stdout redirection to an external utility.
 * a log file contains mostly the calls to the svn and git client utilities and
   can be relatively easy reproduced.
 
@@ -176,78 +270,9 @@ Cons:
   is not supported.
 
 -------------------------------------------------------------------------------
-4. PREREQUISITES
+7. CONFIGURE
 -------------------------------------------------------------------------------
 
-Currently tested these set of OS platforms, interpreters and modules to run
-from:
-
-1. OS platforms.
-
-* Windows 7 (`.bat` only)
-
-2. Interpreters:
-
-* python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
-  https://python.org
-  - standard implementation to run python scripts
-  - 3.7.4 has a bug in the `pytest` module execution, see `KNOWN ISSUES`
-    section
-  - 3.5+ is required for the direct import by a file path (with any extension)
-    as noted in the documentation:
-    https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
-
-3. Modules
-
-* Python site modules:
-
-**  xonsh/0.9.12
-    https://github.com/xonsh/xonsh
-    - to run python scripts and import python modules with `.xsh` file
-      extension
-**  plumbum 1.6.7
-    https://plumbum.readthedocs.io/en/latest/
-    - to run python scripts in a shell like environment
-**  win_unicode_console
-    - to enable unicode symbols support in the Windows console
-**  pyyaml 5.1.1
-    - to read yaml format files (.yaml, .yml)
-**  conditional 1.3
-    - to support conditional `with` statements
-**  fcache 0.4.7
-    - for local cache storage for python scripts
-**  psutil 5.6.7
-    - for processes list request
-**  tzlocal 2.0.0
-    - for local timezone request
-
-Temporary dropped usage:
-
-**  prompt-toolkit 2.0.9
-    - optional dependency to the Xonsh on the Windows
-**  cmdix 0.2.0
-    https://github.com/jaraco/cmdix
-    - extension to use Unix core utils within Python environment as plain
-      executable or python function
-
-4. Patches:
-
-* Python site modules contains patches in the `python_patches` directory:
-
-** fcache
-   - to fix issues from the `fcache execution issues` section.
-
-5. Applications:
-
-* subversion 1.8+
-  https://tortoisesvn.net
-
-* git 2.24+
-  https://git-scm.com
-
--------------------------------------------------------------------------------
-5. CONFIGURE
--------------------------------------------------------------------------------
 1. Run the `configure.vars.*` script from the root directory.
    Edit `config.vars` variables for correct values.
 2. Run the `configure.private.*` script from the root directory.
@@ -272,8 +297,9 @@ Temporary dropped usage:
    file and all the command scripts altogether recursively.
 
 -------------------------------------------------------------------------------
-6. USAGE
+8. USAGE
 -------------------------------------------------------------------------------
+
 Any deploy script format:
   `<HubAbbrivatedName>~<ScmName>~<CommandOperation>.*`, where:
 
@@ -318,7 +344,7 @@ Any deploy script format:
                   `https://` to `svn+ssh://`)
 
 -------------------------------------------------------------------------------
-6.1. Mirroring (merging) from SVN to GIT
+8.1. Mirroring (merging) from SVN to GIT
 -------------------------------------------------------------------------------
 
 To take changes from the git REMOTE repository, then these scripts must be
@@ -334,7 +360,7 @@ a LOCAL repository), then these scripts must be issued:
 2. `<HubAbbrivatedName>~git~push_svn_to_git.*`
 
 -------------------------------------------------------------------------------
-7. SSH+SVN/PLINK SETUP
+9. SSH+SVN/PLINK SETUP
 -------------------------------------------------------------------------------
 Based on: https://stackoverflow.com/questions/11345868/how-to-use-git-svn-with-svnssh-url/58641860#58641860
 
@@ -409,18 +435,18 @@ NOTE:
   files.
 
 -------------------------------------------------------------------------------
-8. KNOWN ISSUES
+10. KNOWN ISSUES
 -------------------------------------------------------------------------------
 For the issues around python xonsh module see details in the
 `README_EN.python_xonsh.known_issues.txt` file.
 
 -------------------------------------------------------------------------------
-8.1. svn+ssh issues
+10.1. svn+ssh issues
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-8.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
-       `svn: E170012: Can't create tunnel`
+10.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+        `svn: E170012: Can't create tunnel`
 -------------------------------------------------------------------------------
 
 Issue #1:
@@ -451,9 +477,9 @@ Solution:
 Manually edit variables in the file for correct values.
 
 -------------------------------------------------------------------------------
-8.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
-       `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
-       `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
+10.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+        `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
+        `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
 -------------------------------------------------------------------------------
 
 Issue:
@@ -473,46 +499,10 @@ NOTE:
   the respective configuration files.
 
 -------------------------------------------------------------------------------
-8.2. Python execution issues
--------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------
-8.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
-       `python_tests`
--------------------------------------------------------------------------------
-
-Issue:
-
-The `python_tests` scripts fails with the titled message.
-
-Reason:
-
-Python version 3.7.4 is broken on Windows 7:
-https://bugs.python.org/issue37549 :
-`os.dup() fails for standard streams on Windows 7`
-
-Solution:
-
-Reinstall a different python version.
-
--------------------------------------------------------------------------------
-8.2.2. `OSError: [WinError 6] The handle is invalid`
--------------------------------------------------------------------------------
-
-Issue:
-
-The python interpreter (3.7, 3.8, 3.9) sometimes throws this message at exit,
-see details here: https://bugs.python.org/issue37380
-
-Solution:
-
-Reinstall a different python version.
-
--------------------------------------------------------------------------------
-8.1.3. Message `Keyboard-interactive authentication prompts from server:`
-       `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
-       `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
-       `svn: E210002: Network connection closed unexpectedly`
+10.1.3. Message `Keyboard-interactive authentication prompts from server:`
+        `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+        `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
+        `svn: E210002: Network connection closed unexpectedly`
 -------------------------------------------------------------------------------
 
 Related command: `git svn ...`
@@ -535,7 +525,43 @@ Solution:
 Read the deatils in the `SSH+SVN/PLINK SETUP` section.
 
 -------------------------------------------------------------------------------
-8.3. pytest execution issues
+10.2. Python execution issues
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+10.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
+        `python_tests`
+-------------------------------------------------------------------------------
+
+Issue:
+
+The `python_tests` scripts fails with the titled message.
+
+Reason:
+
+Python version 3.7.4 is broken on Windows 7:
+https://bugs.python.org/issue37549 :
+`os.dup() fails for standard streams on Windows 7`
+
+Solution:
+
+Reinstall a different python version.
+
+-------------------------------------------------------------------------------
+10.2.2. `OSError: [WinError 6] The handle is invalid`
+-------------------------------------------------------------------------------
+
+Issue:
+
+The python interpreter (3.7, 3.8, 3.9) sometimes throws this message at exit,
+see details here: https://bugs.python.org/issue37380
+
+Solution:
+
+Reinstall a different python version.
+
+-------------------------------------------------------------------------------
+10.3. pytest execution issues
 -------------------------------------------------------------------------------
 * `xonsh incorrectly reorders the test for the pytest` :
   https://github.com/xonsh/xonsh/issues/3380
@@ -546,7 +572,7 @@ Read the deatils in the `SSH+SVN/PLINK SETUP` section.
 
 
 -------------------------------------------------------------------------------
-8.4. fcache execution issues
+10.4. fcache execution issues
 -------------------------------------------------------------------------------
 * `fcache is not multiprocess aware on Windows` :
   https://github.com/tsroten/fcache/issues/26
@@ -556,6 +582,6 @@ Read the deatils in the `SSH+SVN/PLINK SETUP` section.
   https://github.com/tsroten/fcache/issues/28
 
 -------------------------------------------------------------------------------
-9. AUTHOR EMAIL
+11. AUTHOR EMAIL
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
