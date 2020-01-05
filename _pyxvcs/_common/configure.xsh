@@ -196,11 +196,11 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
     configure_dir = validate_vars(configure_dir)
 
     configure_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
-    configure_relpath_comps = configure_relpath.split('/')
-    num_comps = len(configure_relpath_comps)
+    configure_relpath_comp_list = configure_relpath.split('/')
+    configure_relpath_comp_list_size = len(configure_relpath_comp_list)
 
     # load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if num_comps > 1:
+    if configure_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -209,8 +209,8 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
           yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-      for i in range(num_comps-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comps[:i+1]).replace('\\', '/')
+      for i in range(configure_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):
@@ -221,7 +221,7 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
               search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
 
     # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if num_comps > 1:
+    if configure_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -230,8 +230,8 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
           yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-      for i in range(num_comps-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comps[:i+1]).replace('\\', '/')
+      for i in range(configure_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):

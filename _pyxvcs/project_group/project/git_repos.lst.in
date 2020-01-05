@@ -1,9 +1,9 @@
-# <scm_token>|<branch_type>|<remote_name>|<parent_remote_name>|<git_reporoot>|<svn_reporoot>|<git_local_branch>|<git_remote_branch>|<parent_git_path_prefix>|<svn_path_prefix>|<git_svn_init_cmdline>|<git_remote_add_cmdline>
-GIT|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|trunk|--stdlayout|.
-GIT|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|trunk/tools/mytools|.|.
+# <scm_token>|<branch_type>|<remote_name>|<parent_remote_name>|<git_reporoot>|<svn_reporoot>|<git_local_branch>|<git_remote_branch>|<parent_git_path_prefix>|<git_path_prefix>|<svn_path_prefix>|<git_svn_init_cmdline>|<git_remote_add_cmdline>
+GIT|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|.|trunk|--stdlayout|.
+GIT|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|.|trunk/tools/mytools|.|.
 
-GIT2|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|trunk|--stdlayout|.
-GIT2|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|trunk/tools/mytools|.|.
+GIT2|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|.|trunk|--stdlayout|.
+GIT2|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|.|trunk/tools/mytools|.|.
 
-GIT3|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|trunk|--stdlayout|.
-GIT2|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|trunk/tools/mytools|.|.
+GIT3|root|origin|.|${PROJECT_REPO1.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO1.SVN.REPOROOT}|trunk|trunk|.|.|trunk|--stdlayout|.
+GIT2|subtree|tools|origin|${PROJECT_REPO2.${SCM_TOKEN}.ORIGIN}|${PROJECT_REPO2.SVN.REPOROOT}|master|master|tools/mytools|.|trunk/tools/mytools|.|.

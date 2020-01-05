@@ -1,4 +1,8 @@
 2020.01.04:
+* new: `git_path_prefix` parameter in `git_repos.lst.in` configuration file to be able to declare a subdirectory to search/merge a commit in/from a child repository versus a parent repository
+* refactor: _common: minor refactor
+
+2020.01.04:
 * fixed: a typo
 * new: MIT license file
 * changed: readme update
