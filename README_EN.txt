@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.01.04
+* 2020.01.15
 * pyxvcs
 
 1. DESCRIPTION
@@ -276,12 +276,12 @@ Cons:
 1. Run the `configure.vars.*` script from the root directory.
    Edit `config.vars` variables for correct values.
 2. Run the `configure.private.*` script from the root directory.
- . Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define how and
+   Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define how and
    where to generate respective command scripts.
    Edit the reset of variables for correct account values.
    For example, edit the `GIT.USER`/`GIT.EMAIL`/`GIT2.USER`/`GIT2.EMAIL`
    variables to mirror from svn to git under an unique account
-   (will be showed in a merge info after a merge).
+   (will be shown in a merge info after a merge).
    Edit all other variables from the `config.private.yaml` file.
 3. Run the `configure.yaml.*` script from the root directory or from a
    subdirectory you are going to use.
@@ -320,28 +320,29 @@ Any deploy script format:
   `CommandOperation` can be:
 
   [ScmName=git]
-    `init`      - create and initialize local git working copy directory
+    `init`      - create and initialize local git working copy directory.
     `fetch`     - fetch remote git repositories and optionally does
-                  (by default is) the pull of all subtrees
+                  (by default is) the fetch of all subtrees.
     `pull`      - pull remote git repositories and optionally does
-                  (by default is) the fetch of all subtrees
+                  (by default is) the pull of all subtrees.
     `reset`     - reset local working copy and optionally does
-                  (by default is) the reset of all subtree working copies
-    `push_svn_to_git` - same as `pull` plus pushes local git working copy
-                  to the remote <ScmName> repository
-    `compare_commits` - checkouts an svn revision in the SVN WC (as a
-                  subdirectory in the `.git` directory of the associated GIT
-                  WC) and in the associated GIT WC, and does compares both
-                  directories to show changes between SVN and GIT for an SVN
-                  revision.
+                  (by default is) the reset of all subtree working copies.
+    `push_svn_to_git` - fetches and git and svn repositories, merges svn
+                  commits into local git working copies and pushed them into
+                  remote <ScmName> repositories.
+    `compare_commits` - checkouts an svn revision into a local svn working
+                  copy (as a subdirectory in the `.git` directory of the
+                  associated local git repository) and an associated merged git
+                  commit from remote git repository, and does compare both
+                  working copies to show changes for an svn revision.
   [ScmName=svn]
     `checkout`  - checks out an svn repository into new svn working copy
-                  directory
-    `update`    - updates svn working copy directory from the remote svn
-                  repository
-    `relocate`  - updates svn working copy repository url to the remote svn
-                  repository (for example, to change url scheme from
-                  `https://` to `svn+ssh://`)
+                  directory.
+    `update`    - updates svn working copy directory from a remote svn
+                  repository.
+    `relocate`  - changes in the local working copy the url onto different
+                  remote svn repository (for example, to change the url
+                  scheme use these parameters: `https://` `svn+ssh://`).
 
 -------------------------------------------------------------------------------
 8.1. Mirroring (merging) from SVN to GIT
@@ -354,7 +355,7 @@ issued:
 2. `<HubAbbrivatedName>~git~pull.*`
 
 To do a merge from svn REMOTE repository to git REMOTE repository (through
-a LOCAL repository), then these scripts must be issued:
+a LOCAL git-svn repository), then these scripts must be issued:
 
 1. `<HubAbbrivatedName>~git~init.*` (required only if not inited yet)
 2. `<HubAbbrivatedName>~git~push_svn_to_git.*`
