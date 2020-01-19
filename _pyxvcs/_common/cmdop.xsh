@@ -78,7 +78,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
           root_only = False, reset_hard = False,
           remove_svn_on_reset = False, cleanup_on_reset = False, cleanup_on_compare = False,
           verbosity = 0, prune_empty_git_svn_commits = True,
-          retain_commit_git_svn_parents = False):
+          retain_commit_git_svn_parents = False,
+          disable_parent_child_ahead_behind_check = False):
   print("cmdop: {0} {1}: entering `{2}`".format(scm_token, cmd_token, configure_dir))
 
   with tkl.OnExit(lambda: print("cmdop: {0} {1}: leaving `{2}`\n---".format(scm_token, cmd_token, configure_dir))):
@@ -171,7 +172,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
                 reset_hard = reset_hard,
                 prune_empty_git_svn_commits = prune_empty_git_svn_commits,
                 retain_commit_git_svn_parents = retain_commit_git_svn_parents,
-                verbosity = verbosity)
+                verbosity = verbosity,
+                disable_parent_child_ahead_behind_check = disable_parent_child_ahead_behind_check)
             elif cmd_token == 'compare_commits':
               ret = cmdoplib_gitsvn.git_svn_compare_commits(configure_dir, scm_token, compare_remote_name, compare_svn_rev,
                 git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
@@ -316,6 +318,9 @@ if __name__ == '__main__':
                                                                                         # instead of not retain them as by default.
                                                                                         # As a result each git repository would contain 2 commits in commit graph per svn revision
                                                                                         # instead of only one (a merged commit plus parent commits as original git-svn fetch commits).
+  arg_parser.add_argument('--disable_parent_child_ahead_behind_check', action = 'store_true') # Disables check whether the last pushed parent/child repository commit is ahead/behind to
+                                                                                              # the first not pushed child/parent repository commit.
+
   known_args, unknown_args = arg_parser.parse_known_args(sys.argv[4:])
 
   for unknown_arg in unknown_args:
@@ -337,5 +342,6 @@ if __name__ == '__main__':
     cleanup_on_compare = known_args.cleanup_on_compare,
     verbosity = known_args.v,
     prune_empty_git_svn_commits = not known_args.no_prune_empty,
-    retain_commit_git_svn_parents = known_args.retain_commit_git_svn_parents
+    retain_commit_git_svn_parents = known_args.retain_commit_git_svn_parents,
+    disable_parent_child_ahead_behind_check = known_args.disable_parent_child_ahead_behind_check
   )
