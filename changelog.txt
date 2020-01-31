@@ -1,4 +1,7 @@
 2020.01.31:
+* changed: moved `tmpl` directory into `_config` directory to be able to change it separately to scripts from the `_common` directory
+
+2020.01.31:
 * changed: partially merged content from the `contools--3dparty` project
 
 2020.01.31:
