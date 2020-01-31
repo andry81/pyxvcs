@@ -21,6 +21,8 @@ _pyxvcs/_common/tmpl/{HUB}~git~reset.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~svn~checkout.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~svn~relocate.bat.in -text
 _pyxvcs/_common/tmpl/{HUB}~svn~update.bat.in -text
+_pyxvcs/_common/tools/__init__.bat -text
+_pyxvcs/_common/tools/cmd_admin.lnk -text
 _pyxvcs/_common/tools/get_datetime.bat -text
 _pyxvcs/_common/tools/load_config.bat -text
 _pyxvcs/_common/tools/wtee.exe -text
