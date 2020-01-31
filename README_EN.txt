@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.01.15
+* 2020.01.31
 * pyxvcs
 
 1. DESCRIPTION
@@ -25,9 +25,7 @@
         `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
         `svn: E210002: Network connection closed unexpectedly`
 10.2. Python execution issues
-10.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
-        `python_tests`
-10.2.2. `OSError: [WinError 6] The handle is invalid`
+10.2.1. `OSError: [WinError 6] The handle is invalid`
 10.3. pytest execution issues
 10.4. fcache execution issues
 11. AUTHOR EMAIL
@@ -529,27 +527,8 @@ Read the deatils in the `SSH+SVN/PLINK SETUP` section.
 10.2. Python execution issues
 -------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
-10.2.1. `OSError: [WinError 87] The parameter is incorrect` while try to run
-        `python_tests`
--------------------------------------------------------------------------------
-
-Issue:
-
-The `python_tests` scripts fails with the titled message.
-
-Reason:
-
-Python version 3.7.4 is broken on Windows 7:
-https://bugs.python.org/issue37549 :
-`os.dup() fails for standard streams on Windows 7`
-
-Solution:
-
-Reinstall a different python version.
-
--------------------------------------------------------------------------------
-10.2.2. `OSError: [WinError 6] The handle is invalid`
+------------------------------------------------------------------------------
+10.2.1. `OSError: [WinError 6] The handle is invalid`
 -------------------------------------------------------------------------------
 
 Issue:
