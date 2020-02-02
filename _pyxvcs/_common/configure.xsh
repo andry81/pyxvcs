@@ -63,24 +63,25 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
 
     configure_dir = validate_vars(configure_dir)
 
-    try:
-      # load at first from a local config directory
-      for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
-        if not os.path.exists(config_dir):
-          continue
-        if generate_git_repos_list:
-          if os.path.isfile(os.path.join(config_dir, 'git_repos.lst.in')):
-            shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst')),
-        if generate_yaml:
-          if os.path.isfile(os.path.join(config_dir, 'config.yaml.in')):
-            shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml')),
-          if os.path.isfile(os.path.join(config_dir, 'config.env.yaml.in')):
-            shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml')),
-    except:
-      # `exit` with the parentheses to workaround the issue:
-      # `source` xsh file with try/except does hang`:
-      # https://github.com/xonsh/xonsh/issues/3301
-      exit(255)
+    if generate_yaml or generate_git_repos_list:
+      try:
+        # load at first from a local config directory
+        for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
+          if not os.path.exists(config_dir):
+            continue
+          if generate_yaml:
+            if os.path.isfile(os.path.join(config_dir, 'config.yaml.in')):
+              shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+            if os.path.isfile(os.path.join(config_dir, 'config.env.yaml.in')):
+              shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+          if generate_git_repos_list:
+            if os.path.isfile(os.path.join(config_dir, 'git_repos.lst.in')):
+              shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst'))
+      except:
+        # `exit` with the parentheses to workaround the issue:
+        # `source` xsh file with try/except does hang`:
+        # https://github.com/xonsh/xonsh/issues/3301
+        exit(255)
 
     # load at first from a local config directory
     yaml_global_vars_pushed = False
@@ -106,34 +107,35 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
           search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
     if generate_scripts:
-      # except the root, where is has to exist separately
+      # except the root, which has to exist separately
       if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
         shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
         shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.bat.in'), os.path.join(configure_dir, 'configure.bat'))
         shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.yaml.bat.in'), os.path.join(configure_dir, 'configure.yaml.bat'))
 
-      # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
-      # what vcs command scripts to generate and where.
-      scm_list = get_supported_scm_list()
-      tmpl_cmdop_files_tuple_list = []
+    # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
+    # what vcs command scripts to generate and where.
+    scm_list = get_supported_scm_list()
+    tmpl_cmdop_files_tuple_list = []
 
-      for scm in scm_list:
-        for key, value in g_yaml_globals.expanded_items():
-          if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
-            scm_token_upper = key[:key.find('.')].upper()
+    for scm in scm_list:
+      for key, value in g_yaml_globals.expanded_items():
+        if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
+          scm_token_upper = key[:key.find('.')].upper()
 
-            configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
-            if len(configure_relpath) > 0 and configure_relpath != '.':
-              project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
-              is_configure_dir_in_project_path_list = False
-              for project_path in project_path_list:
-                is_configure_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
-                if is_configure_dir_in_project_path_list:
-                  break
+          configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+          if len(configure_relpath) > 0 and configure_relpath != '.':
+            project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
+            is_configure_dir_in_project_path_list = False
+            for project_path in project_path_list:
+              is_configure_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+              if is_configure_dir_in_project_path_list:
+                break
 
-              if not is_configure_dir_in_project_path_list:
-                continue
+            if not is_configure_dir_in_project_path_list:
+              continue
 
+          if generate_scripts:
             for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
               for file in files:
                 if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
@@ -141,6 +143,7 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
                   tmpl_cmdop_files_tuple_list.append((scm_token_upper, file, file[:file.rfind('.')].format(HUB = value)))
               dirs.clear() # not recursively
 
+    if generate_scripts:
       # generate vcs command scripts
       for tmpl_cmdop_files_tuple in tmpl_cmdop_files_tuple_list:
         scm_token_upper = tmpl_cmdop_files_tuple[0]
@@ -157,20 +160,14 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
     for dirpath, dirs, files in os.walk(configure_dir):
       for dir in dirs:
         # ignore directories beginning by '.'
-        if str(dir)[0:1] == '.':
+        dir_str = str(dir)
+        # ignore specific directories
+        if dir_str.startswith('.') or dir_str.startswith('_') or dir_str in [LOCAL_CONFIG_DIR_NAME]:
           continue
-        # ignore common directories
-        if str(dir) in ['_common', LOCAL_CONFIG_DIR_NAME]:
-          continue
-        ## ignore directories w/o config.vars.in and config.yaml.in files
-        #if not (os.path.isfile(os.path.join(dirpath, dir, 'config.vars.in')) and
-        #   os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in'))):
-        #  continue
-        if os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in')):
-          ret = configure(os.path.join(dirpath, dir).replace('\\', '/'), bare_args,
-            generate_yaml = generate_yaml,
-            generate_git_repos_list = generate_git_repos_list,
-            generate_scripts = generate_scripts)
+        ret = configure(os.path.join(dirpath, dir).replace('\\', '/'), bare_args,
+          generate_yaml = generate_yaml,
+          generate_git_repos_list = generate_git_repos_list,
+          generate_scripts = generate_scripts)
       dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:
@@ -191,7 +188,7 @@ def on_main_exit():
       print(registered_ignored_error[1])
       print('---')
 
-def main(configure_root, configure_dir, bare_args, **kwargs):
+def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwargs):
   with tkl.OnExit(on_main_exit):
     configure_dir = validate_vars(configure_dir)
 
@@ -206,6 +203,9 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
           continue
 
         if os.path.exists(config_dir + '/config.yaml.in'):
+          if generate_yaml:
+            shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+
           yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
 
@@ -217,6 +217,9 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
             continue
 
           if os.path.exists(config_dir + '/config.yaml.in'):
+            if generate_yaml:
+              shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+
             yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
               search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
 
@@ -227,6 +230,9 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
           continue
 
         if os.path.exists(config_dir + '/config.env.yaml.in'):
+          if generate_yaml:
+            shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+
           yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
@@ -238,10 +244,13 @@ def main(configure_root, configure_dir, bare_args, **kwargs):
             continue
 
           if os.path.exists(config_dir  + '/config.env.yaml.in'):
+            if generate_yaml:
+              shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+
             yaml_load_config(config_dir , 'config.env.yaml', to_globals = False, to_environ = True,
               search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-    configure(configure_dir, bare_args, **kwargs)
+    configure(configure_dir, bare_args, generate_yaml = generate_yaml, **kwargs)
 
 # CAUTION:
 #   Temporary disabled because of issues in the python xonsh module.
