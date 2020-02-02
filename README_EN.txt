@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.01.31
+* 2020.02.02
 * pyxvcs
 
 1. DESCRIPTION
@@ -117,7 +117,8 @@ Temporary dropped usage:
 
 4. Patches:
 
-* Python site modules contains patches in the `python_patches` directory:
+* Python site modules contains patches in the `_pyxvcs/_common/python_patches`
+  subdirectory:
 
 ** fcache
    - to fix issues from the `fcache execution issues` section.
@@ -197,8 +198,9 @@ levels:
 
 , where a project is always a leaf but project groups can be nested
 
-The directories contains configuration files with various parameters along with
-parameters which can be passed to command scripts in these directories.
+The `myproject` directory contains configuration files with various
+parameters along with parameters which can be passed to command scripts in
+these directores.
 
 The system loads configuration files in directories from the root to the most
 nested directory.
@@ -271,9 +273,11 @@ Cons:
 7. CONFIGURE
 -------------------------------------------------------------------------------
 
-1. Run the `configure.vars.*` script from the root directory.
+From the `_pyxvcs` directory:
+
+1. Run the `01_configure.vars.*` script.
    Edit `config.vars` variables for correct values.
-2. Run the `configure.private.*` script from the root directory.
+2. Run the `02_configure.private.*` script.
    Edit `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to define how and
    where to generate respective command scripts.
    Edit the reset of variables for correct account values.
@@ -281,8 +285,7 @@ Cons:
    variables to mirror from svn to git under an unique account
    (will be shown in a merge info after a merge).
    Edit all other variables from the `config.private.yaml` file.
-3. Run the `configure.yaml.*` script from the root directory or from a
-   subdirectory you are going to use.
+3. Run the `03_configure.yaml.*` script.
    Edit `SVN_SSH_ENABLED` and `GIT_SSH_ENABLED` variables to properly
    enable/disable ssh protocol usage from the svn/git utilities.
    Edit `SVN_SSH_AGENT`, `GIT_SSH_AGENT`, `GIT_SVN_SSH_AGENT` variables related
@@ -290,9 +293,11 @@ Cons:
    Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
    and change the default working copies directory structure if is required to.
    Edit all other variables in `config.yaml` and `config.env.yaml` files.
-4. Run the `configure.*` script from the root directory or from a
-   subdirectory you are going to use to generate `git_repos.lst` configuration
-   file and all the command scripts altogether recursively.
+4. Run the `04_configure.*` script.
+
+Note:
+  You can run respective configure scripts from a nested directory to apply
+  configuration separately in that nested directory.
 
 -------------------------------------------------------------------------------
 8. USAGE
