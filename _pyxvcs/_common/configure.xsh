@@ -106,13 +106,6 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
         yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
           search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
 
-    if generate_scripts:
-      # except the root, which has to exist separately
-      if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
-        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
-        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.bat.in'), os.path.join(configure_dir, 'configure.bat'))
-        shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.yaml.bat.in'), os.path.join(configure_dir, 'configure.yaml.bat'))
-
     # Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to find out
     # what vcs command scripts to generate and where.
     scm_list = get_supported_scm_list()
@@ -135,7 +128,12 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
             if not is_configure_dir_in_project_path_list:
               continue
 
-          if generate_scripts:
+            if generate_scripts:
+              # except the root, which has to exist separately
+              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
+              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.bat.in'), os.path.join(configure_dir, 'configure.bat'))
+              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, 'configure.yaml.bat.in'), os.path.join(configure_dir, 'configure.yaml.bat'))
+
             for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
               for file in files:
                 if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
