@@ -137,6 +137,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
               ret = cmdoplib_svn.svn_checkout(configure_dir, scm_token, bare_args, verbosity = verbosity)
             elif cmd_token == 'relocate':
               ret = cmdoplib_svn.svn_relocate(configure_dir, scm_token, bare_args, verbosity = verbosity)
+            elif cmd_token == 'makedirs':
+              ret = cmdoplib_svn.makedirs(configure_dir, scm_token, verbosity = verbosity)
             else:
               raise Exception('unknown command name: ' + str(cmd_token))
         elif scm_type == 'git':
@@ -179,6 +181,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
                 git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
                 reset_hard = reset_hard, cleanup = cleanup_on_compare,
                 verbosity = verbosity)
+            elif cmd_token == 'makedirs':
+              ret = cmdoplib_gitsvn.makedirs(configure_dir, scm_token, verbosity = verbosity)
             else:
               raise Exception('unknown command name: ' + str(cmd_token))
         else:
@@ -186,24 +190,19 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     for dirpath, dirs, files in os.walk(configure_dir):
       for dir in dirs:
-        # ignore directories beginning by '.'
-        if str(dir)[0:1] == '.':
+        dir_str = str(dir)
+
+        # ignore specific directories
+        if dir_str.startswith('.') or dir_str.startswith('_') or dir_str in [LOCAL_CONFIG_DIR_NAME]:
           continue
-        # ignore common directories
-        if str(dir) in ['_common']:
-          continue
-        ## ignore directories w/o config.vars.in and config.yaml.in files
-        #if not (os.path.isfile(os.path.join(dirpath, dir, 'config.vars.in')) and
-        #   os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in'))):
-        #  continue
-        if os.path.isfile(os.path.join(dirpath, dir, 'config.yaml.in')):
-          ret = cmdop(os.path.join(dirpath, dir).replace('\\', '/'), scm_token, cmd_token, bare_args,
-            git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
-            compare_remote_name = compare_remote_name, compare_svn_rev = compare_svn_rev,
-            root_only = root_only, reset_hard = reset_hard,
-            remove_svn_on_reset = remove_svn_on_reset, cleanup_on_reset = cleanup_on_reset, cleanup_on_compare = cleanup_on_compare,
-            verbosity = verbosity, prune_empty_git_svn_commits = prune_empty_git_svn_commits,
-            retain_commit_git_svn_parents = retain_commit_git_svn_parents)
+
+        ret = cmdop(os.path.join(dirpath, dir).replace('\\', '/'), scm_token, cmd_token, bare_args,
+          git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
+          compare_remote_name = compare_remote_name, compare_svn_rev = compare_svn_rev,
+          root_only = root_only, reset_hard = reset_hard,
+          remove_svn_on_reset = remove_svn_on_reset, cleanup_on_reset = cleanup_on_reset, cleanup_on_compare = cleanup_on_compare,
+          verbosity = verbosity, prune_empty_git_svn_commits = prune_empty_git_svn_commits,
+          retain_commit_git_svn_parents = retain_commit_git_svn_parents)
       dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:

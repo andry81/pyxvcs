@@ -157,11 +157,12 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
 
     for dirpath, dirs, files in os.walk(configure_dir):
       for dir in dirs:
-        # ignore directories beginning by '.'
         dir_str = str(dir)
+
         # ignore specific directories
         if dir_str.startswith('.') or dir_str.startswith('_') or dir_str in [LOCAL_CONFIG_DIR_NAME]:
           continue
+
         ret = configure(os.path.join(dirpath, dir).replace('\\', '/'), bare_args,
           generate_yaml = generate_yaml,
           generate_git_repos_list = generate_git_repos_list,

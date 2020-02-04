@@ -1,3 +1,8 @@
+2020.02.04:
+* fixed: _common: cmdop: commands run irrespective to existence of the `config.yaml.in` file
+* changed: _common: cmdop: filter out all directories beginning by `.` or `_` character
+* new: _common: cmdop: `makedirs` command support
+
 2020.02.03:
 * fixed: minor fix
 
