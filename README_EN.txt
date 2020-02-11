@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.02.02
+* 2020.02.10
 * pyxvcs
 
 1. DESCRIPTION
@@ -28,7 +28,7 @@
 10.2.1. `OSError: [WinError 6] The handle is invalid`
 10.3. pytest execution issues
 10.4. fcache execution issues
-11. AUTHOR EMAIL
+11. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -567,6 +567,6 @@ Reinstall a different python version.
   https://github.com/tsroten/fcache/issues/28
 
 -------------------------------------------------------------------------------
-11. AUTHOR EMAIL
+11. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

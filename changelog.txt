@@ -1,3 +1,6 @@
+2020.02.10:
+* changed: readme update
+
 2020.02.04:
 * fixed: _common: cmdop: commands run irrespective to existence of the `config.yaml.in` file
 * changed: _common: cmdop: filter out all directories beginning by `.` or `_` character
