@@ -14,6 +14,7 @@ _pyxvcs/_common/cmdop.xsh -text
 _pyxvcs/_common/configure.py.bat -text
 _pyxvcs/_common/configure.xsh -text
 _pyxvcs/_common/tools/__init__.bat -text
+_pyxvcs/_common/tools/bash_entry -text
 _pyxvcs/_common/tools/cmd_admin.lnk -text
 _pyxvcs/_common/tools/get_datetime.bat -text
 _pyxvcs/_common/tools/load_config.bat -text

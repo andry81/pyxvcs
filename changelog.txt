@@ -1,3 +1,6 @@
+2020.02.17:
+* new: _common/_tools: `bash_entry` script to support unix shell scripts
+
 2020.02.10:
 * changed: readme update
 
