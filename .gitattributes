@@ -27,10 +27,12 @@ _pyxvcs/_config/tmpl/__init__.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~compare_commits.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~fetch.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~init.bat.in -text
+_pyxvcs/_config/tmpl/{HUB}~git~makedirs.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~pull.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~push_svn_to_git.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~reset.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~checkout.bat.in -text
+_pyxvcs/_config/tmpl/{HUB}~svn~makedirs.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~relocate.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~update.bat.in -text
 _pyxvcs/install_python_modules.bat -text
