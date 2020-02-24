@@ -4,10 +4,10 @@ WCROOT_OFFSET:                          ${CONFIGURE_ROOT}/../_${PROJECT_NAME}
 PROJECT_REPO1.SVN_SF.REPOROOT:          svn+ssh://${SVN_SF.HUB_ROOT}/project/repo1
 
 PROJECT_REPO1.GIT_GH.ORIGIN:            https://${GIT_GH.HUB_ROOT}/${GIT_GH.REPO_OWNER}/project--repo1.git
-PROJECT_REPO2.GIT_GH.ORIGIN:            https://${GIT_GH.HUB_ROOT}/${GIT_GH.REPO_OWNER}/project--repo2.git
+#PROJECT_REPO2.GIT_GH.ORIGIN:            https://${GIT_GH.HUB_ROOT}/${GIT_GH.REPO_OWNER}/project--repo2.git
 
 PROJECT_REPO1.GIT_BB.ORIGIN:            https://${GIT_BB.HUB_ROOT}/${GIT_BB.REPO_OWNER}/project-repo1.git
-PROJECT_REPO2.GIT_BB.ORIGIN:            https://${GIT_BB.HUB_ROOT}/${GIT_BB.REPO_OWNER}/project-repo2.git
+#PROJECT_REPO2.GIT_BB.ORIGIN:            https://${GIT_BB.HUB_ROOT}/${GIT_BB.REPO_OWNER}/project-repo2.git
 
 PROJECT_REPO1.GIT_GL.ORIGIN:            https://${GIT_GL.HUB_ROOT}/${GIT_GL.REPO_OWNER}/project--repo1.git
-PROJECT_REPO2.GIT_GL.ORIGIN:            https://${GIT_GL.HUB_ROOT}/${GIT_GL.REPO_OWNER}/project--repo2.git
+#PROJECT_REPO2.GIT_GL.ORIGIN:            https://${GIT_GL.HUB_ROOT}/${GIT_GL.REPO_OWNER}/project--repo2.git
