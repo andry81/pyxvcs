@@ -45,6 +45,9 @@ if not CMD_TOKEN:
 #except:
 #  pass
 
+def get_supported_scm_list():
+  return ['svn', 'git']
+
 def validate_vars(configure_dir, scm_token):
   if configure_dir == '':
     print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
@@ -92,9 +95,9 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     configure_dir, hub_abbr, scm_type = validate_vars(configure_dir, scm_token)
 
-    # load at first from a local config directory
+    # 1. load configuration files from the directory
+
     yaml_global_vars_pushed = False
-    yaml_environ_vars_pushed = False
     for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
       if not os.path.exists(config_dir):
         continue
@@ -106,6 +109,12 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
           yaml_global_vars_pushed = True
         yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
           search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+        break # break on success
+
+    yaml_environ_vars_pushed = False
+    for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
+      if not os.path.exists(config_dir):
+        continue
 
       if os.path.isfile(config_dir + '/config.env.yaml.in'):
         # save all old variable values and remember all newly added variables as a new stack record
@@ -114,62 +123,84 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
           yaml_environ_vars_pushed = True
         yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
           search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+        break # break on success
+
+    # 2. Read all `*.HUB_ABBR` and `*.PROJECT_PATH_LIST` variables to collect all project paths.
+
+    scm_list = get_supported_scm_list()
+
+    scm_project_paths_list = None
+    all_project_paths_set = set()
+
+    for scm in scm_list:
+      for key, value in g_yaml_globals.expanded_items():
+        if key.startswith(scm.upper()) and key.endswith('.HUB_ABBR'):
+          scm_token_upper = key[:key.find('.')].upper()
+
+          project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
+
+          if scm_type == scm:
+            scm_project_paths_list = project_path_list
+          all_project_paths_set.update(project_path_list)
+
+    # 3. Call a command if a nested directory is in the project paths list.
 
     ret = 0
 
     # do action only if not in the root and a command file is present
     if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
-      dir_files_wo_ext = [os.path.splitext(f)[0] for f in os.listdir(configure_dir) if os.path.isfile(f)]
-      cmd_file = hub_abbr + '~' + scm_type + '~' + cmd_token
+      configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
 
-      is_cmd_file_found = False
-      for dir_file_wo_ext in dir_files_wo_ext:
-        if tkl.compare_file_paths(dir_file_wo_ext, cmd_file):
-          is_cmd_file_found = True
+      is_cmdop_dir_in_project_path_list = False
+      for project_path in all_project_paths_set:
+        is_cmdop_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+        if is_cmdop_dir_in_project_path_list:
           break
 
-      if is_cmd_file_found:
+      if is_cmdop_dir_in_project_path_list:
+        nested_ret = 0
+
         if scm_type == 'svn':
           if hasglobalvar(scm_token + '.WCROOT_DIR'):
             if cmd_token == 'update':
-              ret = cmdoplib_svn.svn_update(configure_dir, scm_token, bare_args, verbosity = verbosity)
+              nested_ret = cmdoplib_svn.svn_update(configure_dir, scm_token, bare_args, verbosity = verbosity)
             elif cmd_token == 'checkout':
-              ret = cmdoplib_svn.svn_checkout(configure_dir, scm_token, bare_args, verbosity = verbosity)
+              nested_ret = cmdoplib_svn.svn_checkout(configure_dir, scm_token, bare_args, verbosity = verbosity)
             elif cmd_token == 'relocate':
-              ret = cmdoplib_svn.svn_relocate(configure_dir, scm_token, bare_args, verbosity = verbosity)
+              nested_ret = cmdoplib_svn.svn_relocate(configure_dir, scm_token, bare_args, verbosity = verbosity)
             elif cmd_token == 'makedirs':
-              ret = cmdoplib_svn.makedirs(configure_dir, scm_token, verbosity = verbosity)
+              nested_ret = cmdoplib_svn.makedirs(configure_dir, scm_token, verbosity = verbosity)
             else:
               raise Exception('unknown command name: ' + str(cmd_token))
         elif scm_type == 'git':
           if hasglobalvar(scm_token + '.WCROOT_DIR'):
             if cmd_token == 'init':
-              ret = cmdoplib_gitsvn.git_init(configure_dir, scm_token,
+              nested_ret = cmdoplib_gitsvn.git_init(configure_dir, scm_token,
                 git_subtrees_root = git_subtrees_root,
                 root_only = root_only,
                 verbosity = verbosity)
             elif cmd_token == 'fetch':
-              ret = cmdoplib_gitsvn.git_fetch(configure_dir, scm_token,
+              nested_ret = cmdoplib_gitsvn.git_fetch(configure_dir, scm_token,
                 git_subtrees_root = git_subtrees_root,
                 root_only = root_only, reset_hard = reset_hard,
                 prune_empty_git_svn_commits = prune_empty_git_svn_commits,
                 verbosity = verbosity)
             elif cmd_token == 'reset':
-              ret = cmdoplib_gitsvn.git_reset(configure_dir, scm_token,
+              nested_ret = cmdoplib_gitsvn.git_reset(configure_dir, scm_token,
                 git_subtrees_root = git_subtrees_root,
                 root_only = root_only,
                 reset_hard = reset_hard, cleanup = cleanup_on_reset,
                 remove_svn_on_reset = remove_svn_on_reset,
                 verbosity = verbosity)
             elif cmd_token == 'pull':
-              ret = cmdoplib_gitsvn.git_pull(configure_dir, scm_token,
+              nested_ret = cmdoplib_gitsvn.git_pull(configure_dir, scm_token,
                 git_subtrees_root = git_subtrees_root,
                 root_only = root_only,
                 reset_hard = reset_hard,
                 prune_empty_git_svn_commits = prune_empty_git_svn_commits,
                 verbosity = verbosity)
             elif cmd_token == 'push_svn_to_git':
-              ret = cmdoplib_gitsvn.git_push_from_svn(configure_dir, scm_token,
+              nested_ret = cmdoplib_gitsvn.git_push_from_svn(configure_dir, scm_token,
                 git_subtrees_root = git_subtrees_root,
                 reset_hard = reset_hard,
                 prune_empty_git_svn_commits = prune_empty_git_svn_commits,
@@ -177,32 +208,54 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
                 verbosity = verbosity,
                 disable_parent_child_ahead_behind_check = disable_parent_child_ahead_behind_check)
             elif cmd_token == 'compare_commits':
-              ret = cmdoplib_gitsvn.git_svn_compare_commits(configure_dir, scm_token, compare_remote_name, compare_svn_rev,
+              nested_ret = cmdoplib_gitsvn.git_svn_compare_commits(configure_dir, scm_token, compare_remote_name, compare_svn_rev,
                 git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
                 reset_hard = reset_hard, cleanup = cleanup_on_compare,
                 verbosity = verbosity)
             elif cmd_token == 'makedirs':
-              ret = cmdoplib_gitsvn.makedirs(configure_dir, scm_token, verbosity = verbosity)
+              nested_ret = cmdoplib_gitsvn.makedirs(configure_dir, scm_token, verbosity = verbosity)
             else:
               raise Exception('unknown command name: ' + str(cmd_token))
         else:
           raise Exception('unsupported scm name: ' + str(scm_token))
+
+        if nested_ret:
+          ret |= 1
+
+    # 4. Call a nested command if a nested directory is in the project paths list.
 
     for dirpath, dirs, files in os.walk(configure_dir):
       for dir in dirs:
         dir_str = str(dir)
 
         # ignore specific directories
-        if dir_str.startswith('.') or dir_str.startswith('_') or dir_str in [LOCAL_CONFIG_DIR_NAME]:
+        if dir_str.startswith('.'):
           continue
 
-        ret = cmdop(os.path.join(dirpath, dir).replace('\\', '/'), scm_token, cmd_token, bare_args,
+        nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
+
+        configure_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
+
+        is_cmdop_dir_in_project_path_list = False
+        for project_path in all_project_paths_set:
+          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_relpath + '/')
+          if is_cmdop_dir_in_project_path_list:
+            break
+
+        if not is_cmdop_dir_in_project_path_list:
+          continue
+
+        nested_ret = cmdop(nested_cmd_dir, scm_token, cmd_token, bare_args,
           git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
           compare_remote_name = compare_remote_name, compare_svn_rev = compare_svn_rev,
           root_only = root_only, reset_hard = reset_hard,
           remove_svn_on_reset = remove_svn_on_reset, cleanup_on_reset = cleanup_on_reset, cleanup_on_compare = cleanup_on_compare,
           verbosity = verbosity, prune_empty_git_svn_commits = prune_empty_git_svn_commits,
           retain_commit_git_svn_parents = retain_commit_git_svn_parents)
+
+        if nested_ret:
+          ret |= 2
+
       dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:
@@ -240,6 +293,7 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
         if os.path.exists(config_dir + '/config.yaml.in'):
           yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+          break # break on success
 
       for i in range(configure_relpath_comp_list_size-1):
         configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
@@ -251,6 +305,7 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
           if os.path.exists(config_dir + '/config.yaml.in'):
             yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
               search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
+            break # break on success
 
     # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
     if configure_relpath_comp_list_size > 1:
@@ -261,6 +316,7 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
         if os.path.exists(config_dir + '/config.env.yaml.in'):
           yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+          break # break on success
 
       for i in range(configure_relpath_comp_list_size-1):
         configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
@@ -272,6 +328,7 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
           if os.path.exists(config_dir + '/config.env.yaml.in'):
             yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
               search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
+            break # break on success
 
     dir_files_wo_ext = [os.path.splitext(f)[0] for f in os.listdir(configure_dir) if os.path.isfile(f)]
     cmd_file = hub_abbr + '~' + scm_type + '~' + cmd_token

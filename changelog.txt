@@ -1,3 +1,9 @@
+2020.02.24:
+* fixed: svn externals
+* fixed: configuration files and scripts generation by project paths walking instead by all directories walking to avoid paths which is not a part of project paths or does not have (yet) configuration files or script files
+* changed: switched all scrips to break-on-success strategy when loads the same configuration files from multiple directories
+* refactor: configuration variables refactor
+
 2020.02.17:
 * new: _common/_tools: `bash_entry` script to support unix shell scripts
 
