@@ -1,4 +1,7 @@
 2020.02.24:
+* changed: tools: `load_config.bat` improved to load compatible to the unix shell configuration `key=value` pairs: `key="value"` instead of `"key=value"` or `key=(value0 ... valueN)` for a list of values
+
+2020.02.24:
 * refactor: example refactor
 
 2020.02.24:
