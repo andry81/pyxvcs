@@ -1,3 +1,11 @@
+2020.02.26:
+* fixed: tools: bash_entry: accidental `$1` argument pass into `source` statement
+* fixed: configure.xsh: generate `__init__` scripts in all project paths hierarchy except the root, calling script directory and above
+* new: tools: bash_entry: `tkl_make_source_file_components_from_file_path` function to manually update source file components from any file path
+* new: tools: `load_config.bat` script port into `load_config.sh` script
+* new: `__init__.bat` script port into `__init__.sh` script
+* refactor: cleanup
+
 2020.02.24:
 * changed: tools: `load_config.bat` improved to load compatible to the unix shell configuration `key=value` pairs: `key="value"` instead of `"key=value"` or `key=(value0 ... valueN)` for a list of values
 

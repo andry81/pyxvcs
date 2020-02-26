@@ -1,4 +1,4 @@
-import os, sys, shutil, inspect, argparse
+import os, sys, platform, shutil, inspect, argparse
 #from datetime import datetime
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
@@ -92,6 +92,21 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
             shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst'))
             break # break on success
 
+      if generate_scripts:
+        # CAUTION:
+        #   We must generate `__init__` scripts in all project paths hierarchy:
+        #   1. Except the root, which has to exist separately.
+        #   2. Except the directory with the script and above.
+        #
+        if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
+          root_configure_dir_relpath = os.path.relpath(CONFIGURE_DIR, CONFIGURE_ROOT).replace('\\', '/')
+          configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+          is_configure_dir_not_below_script_dir = tkl.is_file_path_beginswith(root_configure_dir_relpath + '/', configure_dir_relpath + '/')
+          if not is_configure_dir_not_below_script_dir:
+            if platform.system() == 'Windows':
+              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
+            shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.sh.in'), os.path.join(configure_dir, '__init__.sh'))
+
     except:
       # `exit` with the parentheses to workaround the issue:
       # `source` xsh file with try/except does hang`:
@@ -145,20 +160,17 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
           all_project_paths_set.update(project_path_list)
 
           if generate_scripts:
-            configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+            configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
 
-            if len(configure_relpath) > 0 and configure_relpath != '.':
+            if len(configure_dir_relpath) > 0 and configure_dir_relpath != '.':
               is_cmd_dir_in_project_path_list = False
               for project_path in project_path_list:
-                is_cmd_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+                is_cmd_dir_in_project_path_list = tkl.compare_file_paths(configure_dir_relpath, project_path)
                 if is_cmd_dir_in_project_path_list:
                   break
 
               if not is_cmd_dir_in_project_path_list:
                 continue
-
-              # except the root, which has to exist separately
-              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
 
               for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
                 for file in files:
@@ -194,11 +206,11 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
 
         nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
 
-        configure_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
+        configure_dir_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
 
         is_cmdop_dir_in_project_path_list = False
         for project_path in all_project_paths_set:
-          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_relpath + '/')
+          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/')
           if is_cmdop_dir_in_project_path_list:
             break
 
@@ -237,12 +249,12 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
   with tkl.OnExit(on_main_exit):
     configure_dir = validate_vars(configure_dir)
 
-    configure_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
-    configure_relpath_comp_list = configure_relpath.split('/')
-    configure_relpath_comp_list_size = len(configure_relpath_comp_list)
+    configure_dir_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
+    configure_dir_relpath_comp_list = configure_dir_relpath.split('/')
+    configure_dir_relpath_comp_list_size = len(configure_dir_relpath_comp_list)
 
     # load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if configure_relpath_comp_list_size > 1:
+    if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -255,8 +267,8 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
           break # break on success
 
-      for i in range(configure_relpath_comp_list_size-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
+      for i in range(configure_dir_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_dir_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):
@@ -271,7 +283,7 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
             break # break on success
 
     # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if configure_relpath_comp_list_size > 1:
+    if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -284,8 +296,8 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
           break # break on success
 
-      for i in range(configure_relpath_comp_list_size-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
+      for i in range(configure_dir_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_dir_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):

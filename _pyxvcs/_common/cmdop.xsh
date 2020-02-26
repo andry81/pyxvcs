@@ -149,11 +149,11 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     # do action only if not in the root and a command file is present
     if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
-      configure_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+      configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
 
       is_cmdop_dir_in_project_path_list = False
       for project_path in all_project_paths_set:
-        is_cmdop_dir_in_project_path_list = tkl.compare_file_paths(configure_relpath, project_path)
+        is_cmdop_dir_in_project_path_list = tkl.compare_file_paths(configure_dir_relpath, project_path)
         if is_cmdop_dir_in_project_path_list:
           break
 
@@ -234,11 +234,11 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
         nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
 
-        configure_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
+        configure_dir_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
 
         is_cmdop_dir_in_project_path_list = False
         for project_path in all_project_paths_set:
-          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_relpath + '/')
+          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/')
           if is_cmdop_dir_in_project_path_list:
             break
 
@@ -280,12 +280,12 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
   with tkl.OnExit(on_main_exit):
     configure_dir, hub_abbr, scm_type = validate_vars(configure_dir, scm_token)
 
-    configure_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
-    configure_relpath_comp_list = configure_relpath.split('/')
-    configure_relpath_comp_list_size = len(configure_relpath_comp_list)
+    configure_dir_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
+    configure_dir_relpath_comp_list = configure_dir_relpath.split('/')
+    configure_dir_relpath_comp_list_size = len(configure_dir_relpath_comp_list)
 
     # load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if configure_relpath_comp_list_size > 1:
+    if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -295,8 +295,8 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
           break # break on success
 
-      for i in range(configure_relpath_comp_list_size-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
+      for i in range(configure_dir_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_dir_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):
@@ -308,7 +308,7 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
             break # break on success
 
     # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
-    if configure_relpath_comp_list_size > 1:
+    if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
@@ -318,8 +318,8 @@ def main(configure_root, configure_dir, scm_token, cmd_token, bare_args, **kwarg
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
           break # break on success
 
-      for i in range(configure_relpath_comp_list_size-1):
-        configure_parent_dir = os.path.join(configure_root, *configure_relpath_comp_list[:i+1]).replace('\\', '/')
+      for i in range(configure_dir_relpath_comp_list_size-1):
+        configure_parent_dir = os.path.join(configure_root, *configure_dir_relpath_comp_list[:i+1]).replace('\\', '/')
 
         for config_dir in [configure_parent_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_parent_dir]:
           if not os.path.exists(config_dir):
