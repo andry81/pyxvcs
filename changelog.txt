@@ -1,3 +1,7 @@
+2020.04.03:
+* new: _common: explicit usage of the global config `log_import_module` parameter in the `tkl_init` function
+* new: _config: explicit usage of the global config `TACKLELIB_LOG_IMPORT_MODULE` parameter in the `config.vars` file
+
 2020.03.03:
 * changed: _common/tools: `bash_entry` file is removed because now is fully migrated into the `tacklelib` library
 * changed: readme update

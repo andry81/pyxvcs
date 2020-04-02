@@ -8,6 +8,7 @@ SOURCE_DIR = os.path.dirname(SOURCE_FILE)
 sys.path.append(SOURCE_DIR + '/tools/tacklelib')
 import tacklelib as tkl
 
+tkl.tkl_init(tkl, global_config = {'log_import_module':os.environ.get('TACKLELIB_LOG_IMPORT_MODULE')})
 tkl.tkl_init(tkl)
 
 # cleanup
