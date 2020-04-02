@@ -1,34 +1,36 @@
 * README_EN.txt
-* 2020.02.10
+* 2020.03.03
 * pyxvcs
 
 1. DESCRIPTION
 2. LICENSE
 3. REPOSITORIES
 4. PREREQUISITES
-5. CATALOG CONTENT DESCRIPTION
-6. FEATURES
-6.1. SVN-to-GIT
-7. CONFIGURE
-8. USAGE
-8.1. Mirroring (merging) from SVN to GIT
-9. SSH+SVN/PLINK SETUP
-10. KNOWN ISSUES
-10.1. svn+ssh issues
-10.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+5. DEPENDENCIES
+6. CATALOG CONTENT DESCRIPTION
+7. FEATURES
+7.1. SVN-to-GIT
+8. PRECONFIGURE
+9. CONFIGURE
+10. USAGE
+10.1. Mirroring (merging) from SVN to GIT
+11. SSH+SVN/PLINK SETUP
+12. KNOWN ISSUES
+12.1. svn+ssh issues
+12.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E170012: Can't create tunnel`
-10.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+12.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
         `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
         `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
-10.1.3. Message `Keyboard-interactive authentication prompts from server:`
+12.1.3. Message `Keyboard-interactive authentication prompts from server:`
         `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
         `svn: E210002: Network connection closed unexpectedly`
-10.2. Python execution issues
-10.2.1. `OSError: [WinError 6] The handle is invalid`
-10.3. pytest execution issues
-10.4. fcache execution issues
-11. AUTHOR
+12.2. Python execution issues
+12.2.1. `OSError: [WinError 6] The handle is invalid`
+12.3. pytest execution issues
+12.4. fcache execution issues
+13. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -60,19 +62,41 @@ Second mirror:
   * https://bitbucket.org/andry81/pyxvcs/src/trunk
   * https://bitbucket.org/andry81/pyxvcs.git
 
+The `tacklelib` library repositories:
+
+Primary:
+  * https://sf.net/p/tacklelib/tacklelib/HEAD/tree/trunk
+  * https://svn.code.sf.net/p/tacklelib/tacklelib/trunk
+First mirror:
+  * https://github.com/andry81/tacklelib/tree/trunk
+  * https://github.com/andry81/tacklelib.git
+Second mirror:
+  * https://bitbucket.org/andry81/tacklelib/src/trunk
+  * https://bitbucket.org/andry81/tacklelib.git
+
 -------------------------------------------------------------------------------
 4. PREREQUISITES
 -------------------------------------------------------------------------------
 
-Currently tested these set of OS platforms, interpreters and modules to run
-from:
+Currently used these set of OS platforms, compilers, interpreters, modules,
+IDE's, applications and patches to run with or from:
 
-1. OS platforms.
+1. OS platforms:
 
-* Windows 7 (`.bat` only)
+* Windows 7 (`.bat` only, minimal version for the cmake 3.14)
+* Cygwin 1.7.x (`.sh` only)
+* Linux Mint 18.3 x64 (`.sh` only)
 
-2. Interpreters:
+2. C++11 compilers:
 
+* (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
+* (secondary) GCC 5.4+
+* (experimental) Clang 3.8+
+
+3. Interpreters:
+
+* bash shell 3.2.48+
+  - to run unix shell scripts
 * python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
   https://python.org
   - standard implementation to run python scripts
@@ -82,7 +106,7 @@ from:
     as noted in the documentation:
     https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
 
-3. Modules
+4. Modules:
 
 * Python site modules:
 
@@ -115,15 +139,13 @@ Temporary dropped usage:
     - extension to use Unix core utils within Python environment as plain
       executable or python function
 
-4. Patches:
+5. IDE's:
 
-* Python site modules contains patches in the `_pyxvcs/_common/python_patches`
-  subdirectory:
+* Microsoft Visual Studio 2015 Update 3
+* Microsoft Visual Studio 2017
+* QtCreator 4.6+
 
-** fcache
-   - to fix issues from the `fcache execution issues` section.
-
-5. Applications:
+6. Applications:
 
 * subversion 1.8+
   https://tortoisesvn.net
@@ -132,6 +154,23 @@ Temporary dropped usage:
 * git 2.24+
   https://git-scm.com
   - to run git client
+
+7. Patches:
+
+* Python site modules contains patches in the `python_patches`
+  subdirectory:
+
+** fcache
+   - to fix issues from the `fcache execution issues` section.
+
+-------------------------------------------------------------------------------
+5. DEPENDENCIES
+-------------------------------------------------------------------------------
+
+NOTE:
+  To run bash shell scripts (`.sh` file extension) you should copy from the
+  `tacklelib` library the `/bash/tacklelib/bash_entry` module into the `/bin`
+  directory of your platform.
 
 -------------------------------------------------------------------------------
 5. CATALOG CONTENT DESCRIPTION
@@ -210,7 +249,7 @@ the same variable in the parent directory, then the value from the nested one
 is used instead (variable specialization).
 
 -------------------------------------------------------------------------------
-6. FEATURES
+7. FEATURES
 -------------------------------------------------------------------------------
 
 Currently only several limited features is suppported:
@@ -220,7 +259,7 @@ Currently only several limited features is suppported:
 * one script per a command in a repository
 
 -------------------------------------------------------------------------------
-6.1. SVN-to-GIT
+7.1. SVN-to-GIT
 -------------------------------------------------------------------------------
 
 Pros:
@@ -270,7 +309,13 @@ Cons:
   is not supported.
 
 -------------------------------------------------------------------------------
-7. CONFIGURE
+8. PRECONFIGURE
+-------------------------------------------------------------------------------
+
+Not required.
+
+-------------------------------------------------------------------------------
+9. CONFIGURE
 -------------------------------------------------------------------------------
 
 From the `_pyxvcs` directory:
@@ -300,7 +345,7 @@ Note:
   configuration separately in that nested directory.
 
 -------------------------------------------------------------------------------
-8. USAGE
+10. USAGE
 -------------------------------------------------------------------------------
 
 Any deploy script format:
@@ -348,7 +393,7 @@ Any deploy script format:
                   scheme use these parameters: `https://` `svn+ssh://`).
 
 -------------------------------------------------------------------------------
-8.1. Mirroring (merging) from SVN to GIT
+10.1. Mirroring (merging) from SVN to GIT
 -------------------------------------------------------------------------------
 
 To take changes from the git REMOTE repository, then these scripts must be
@@ -364,7 +409,7 @@ a LOCAL git-svn repository), then these scripts must be issued:
 2. `<HubAbbrivatedName>~git~push_svn_to_git.*`
 
 -------------------------------------------------------------------------------
-9. SSH+SVN/PLINK SETUP
+11. SSH+SVN/PLINK SETUP
 -------------------------------------------------------------------------------
 Based on: https://stackoverflow.com/questions/11345868/how-to-use-git-svn-with-svnssh-url/58641860#58641860
 
@@ -439,17 +484,17 @@ NOTE:
   files.
 
 -------------------------------------------------------------------------------
-10. KNOWN ISSUES
+12. KNOWN ISSUES
 -------------------------------------------------------------------------------
 For the issues around python xonsh module see details in the
 `README_EN.python_xonsh.known_issues.txt` file.
 
 -------------------------------------------------------------------------------
-10.1. svn+ssh issues
+12.1. svn+ssh issues
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-10.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+12.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E170012: Can't create tunnel`
 -------------------------------------------------------------------------------
 
@@ -481,7 +526,7 @@ Solution:
 Manually edit variables in the file for correct values.
 
 -------------------------------------------------------------------------------
-10.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+12.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
         `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
         `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
 -------------------------------------------------------------------------------
@@ -503,7 +548,7 @@ NOTE:
   the respective configuration files.
 
 -------------------------------------------------------------------------------
-10.1.3. Message `Keyboard-interactive authentication prompts from server:`
+12.1.3. Message `Keyboard-interactive authentication prompts from server:`
         `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
         `svn: E210002: Network connection closed unexpectedly`
@@ -529,11 +574,11 @@ Solution:
 Read the deatils in the `SSH+SVN/PLINK SETUP` section.
 
 -------------------------------------------------------------------------------
-10.2. Python execution issues
+12.2. Python execution issues
 -------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-10.2.1. `OSError: [WinError 6] The handle is invalid`
+12.2.1. `OSError: [WinError 6] The handle is invalid`
 -------------------------------------------------------------------------------
 
 Issue:
@@ -546,7 +591,7 @@ Solution:
 Reinstall a different python version.
 
 -------------------------------------------------------------------------------
-10.3. pytest execution issues
+12.3. pytest execution issues
 -------------------------------------------------------------------------------
 * `xonsh incorrectly reorders the test for the pytest` :
   https://github.com/xonsh/xonsh/issues/3380
@@ -557,7 +602,7 @@ Reinstall a different python version.
 
 
 -------------------------------------------------------------------------------
-10.4. fcache execution issues
+12.4. fcache execution issues
 -------------------------------------------------------------------------------
 * `fcache is not multiprocess aware on Windows` :
   https://github.com/tsroten/fcache/issues/26
@@ -567,6 +612,6 @@ Reinstall a different python version.
   https://github.com/tsroten/fcache/issues/28
 
 -------------------------------------------------------------------------------
-11. AUTHOR
+13. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

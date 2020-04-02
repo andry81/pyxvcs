@@ -1,3 +1,7 @@
+2020.03.03:
+* changed: _common/tools: `bash_entry` file is removed because now is fully migrated into the `tacklelib` library
+* changed: readme update
+
 2020.02.26:
 * fixed: tools: bash_entry: accidental `$1` argument pass into `source` statement
 * fixed: configure.xsh: generate `__init__` scripts in all project paths hierarchy except the root, calling script directory and above
