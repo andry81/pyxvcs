@@ -1,3 +1,6 @@
+2020.04.04:
+* fixed: _config: tmpl: missed arguments pass in chain call to `__init__.*` scripts
+
 2020.04.03:
 * new: _common: explicit usage of the global config `log_import_module` parameter in the `tkl_init` function
 * new: _config: explicit usage of the global config `TACKLELIB_LOG_IMPORT_MODULE` parameter in the `config.vars` file
