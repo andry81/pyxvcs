@@ -1,3 +1,14 @@
+2020.04.05:
+* new: bash configure and project scripts
+* new: configure scripts self logging
+* new: tools: `load_config.*` scripts supports new syntax like `[<attribute> ]<var>[:<platform>][=<value>]` to declare an environment variable per specific platform with optional `export` variable attribute
+* changed: update with latest `bash_entry` script implementation
+* changed: `04_configure.yaml.*` splitted into `04_configure.root_yaml.*` and `05_configure.project_yaml.*` scripts to separately generate root yaml configuration files and project yaml configuration files
+* changed: `05_configure.*` now generates project scripts for a single shell extension (either `*.bat` or `*.sh`)
+* changed: readme update
+* refactor: project scripts self logging refactor
+* refactor: python scripts moved to standalone directory
+
 2020.04.04:
 * fixed: _config: tmpl: missed arguments pass in chain call to `__init__.*` scripts
 

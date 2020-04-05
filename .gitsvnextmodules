@@ -6,10 +6,18 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
-[submodule "_pyxvcs/_common/tools/cmdoplib"]
-	path = _pyxvcs/_common/tools/cmdoplib
+[submodule "_pyxvcs/_common/tools/bash"]
+	path = _pyxvcs/_common/tools/bash
 	owner = _pyxvcs/_common/tools
-	url = /p/tacklelib/tacklelib/trunk/python/cmdoplib
+	url = /p/tacklelib/tacklelib/trunk/bash
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "_pyxvcs/_common/tools/python"]
+	path = _pyxvcs/_common/tools/python
+	owner = _pyxvcs/_common/tools
+	url = /p/tacklelib/tacklelib/trunk/python
 	branch = /
 	fetch = :refs/remotes/git-svn
 	remote = svn
@@ -18,14 +26,6 @@
 	path = _pyxvcs/_common/tools/std
 	owner = _pyxvcs/_common/tools
 	url = /p/contools/contools/trunk/Scripts/Tools/std
-	branch = /
-	fetch = :refs/remotes/git-svn
-	remote = svn
-	type = dir
-[submodule "_pyxvcs/_common/tools/tacklelib"]
-	path = _pyxvcs/_common/tools/tacklelib
-	owner = _pyxvcs/_common/tools
-	url = /p/tacklelib/tacklelib/trunk/python/tacklelib
 	branch = /
 	fetch = :refs/remotes/git-svn
 	remote = svn

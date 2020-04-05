@@ -5,11 +5,10 @@ SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
 SOURCE_DIR = os.path.dirname(SOURCE_FILE)
 
 # portable import to the global space
-sys.path.append(SOURCE_DIR + '/tools/tacklelib')
+sys.path.append(SOURCE_DIR + '/tools/python/tacklelib')
 import tacklelib as tkl
 
 tkl.tkl_init(tkl, global_config = {'log_import_module':os.environ.get('TACKLELIB_LOG_IMPORT_MODULE')})
-tkl.tkl_init(tkl)
 
 # cleanup
 del tkl # must be instead of `tkl = None`, otherwise the variable would be still persist
@@ -51,24 +50,24 @@ def get_supported_scm_list():
 
 def validate_vars(configure_dir, scm_token):
   if configure_dir == '':
-    print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
+    tkl.print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
     exit(1)
 
   if configure_dir[-1:] in ['\\', '/']:
     configure_dir = configure_dir[:-1]
 
   if not os.path.isdir(configure_dir):
-    print_err("{0}: error: configure directory does not exist: `{1}`.".format(sys.argv[0], configure_dir))
+    tkl.print_err("{0}: error: configure directory does not exist: `{1}`.".format(sys.argv[0], configure_dir))
     exit(2)
 
   hub_root_var = scm_token + '.HUB_ROOT'
   if not hasglobalvar(hub_root_var):
-    print_err("{0}: error: hub root variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_root_var))
+    tkl.print_err("{0}: error: hub root variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_root_var))
     exit(3)
 
   hub_abbr_var = scm_token + '.HUB_ABBR'
   if not hasglobalvar(hub_abbr_var):
-    print_err("{0}: error: hub abbrivation variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_abbr_var))
+    tkl.print_err("{0}: error: hub abbrivation variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_abbr_var))
     exit(4)
 
   hub_abbr = getglobalvar(hub_abbr_var)

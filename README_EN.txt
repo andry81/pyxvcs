@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.03.03
+* 2020.04.06
 * pyxvcs
 
 1. DESCRIPTION
@@ -8,29 +8,30 @@
 4. PREREQUISITES
 5. DEPENDENCIES
 6. CATALOG CONTENT DESCRIPTION
-7. FEATURES
-7.1. SVN-to-GIT
+7. PROJECT CONFIGURATION VARIABLES
 8. PRECONFIGURE
 9. CONFIGURE
 10. USAGE
 10.1. Mirroring (merging) from SVN to GIT
-11. SSH+SVN/PLINK SETUP
-12. KNOWN ISSUES
-12.1. svn+ssh issues
-12.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+11. FEATURES
+11.1. SVN-to-GIT
+12. SSH+SVN/PLINK SETUP
+13. KNOWN ISSUES
+13.1. svn+ssh issues
+13.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E170012: Can't create tunnel`
-12.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+13.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
         `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
         `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
-12.1.3. Message `Keyboard-interactive authentication prompts from server:`
+13.1.3. Message `Keyboard-interactive authentication prompts from server:`
         `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
         `svn: E210002: Network connection closed unexpectedly`
-12.2. Python execution issues
-12.2.1. `OSError: [WinError 6] The handle is invalid`
-12.3. pytest execution issues
-12.4. fcache execution issues
-13. AUTHOR
+13.2. Python execution issues
+13.2.1. `OSError: [WinError 6] The handle is invalid`
+13.3. pytest execution issues
+13.4. fcache execution issues
+14. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -173,7 +174,7 @@ NOTE:
   directory of your platform.
 
 -------------------------------------------------------------------------------
-5. CATALOG CONTENT DESCRIPTION
+6. CATALOG CONTENT DESCRIPTION
 -------------------------------------------------------------------------------
 
 The example directory structure is this:
@@ -249,64 +250,126 @@ the same variable in the parent directory, then the value from the nested one
 is used instead (variable specialization).
 
 -------------------------------------------------------------------------------
-7. FEATURES
+7. PROJECT CONFIGURATION VARIABLES
 -------------------------------------------------------------------------------
 
-Currently only several limited features is suppported:
+1. `_config/config.vars`
 
-* one-way limited conversion from svn to git (svn2git)
-* svn/git basic commands in a project group context
-* one script per a command in a repository
+Basic shell variables file designed to be used at a shell script level.
 
--------------------------------------------------------------------------------
-7.1. SVN-to-GIT
--------------------------------------------------------------------------------
+Stores these set of variables:
 
-Pros:
+* PYTHON_EXE_PATH
 
-* access to a remote repository servers only through the svn and git utilities,
-  no need a direct access to a bare repository.
-* a single SVN repository can be splitted into multiple GIT repositories.
-* svn revisions can be represented by the git commits in a not linear history
-  (a git commit with more than 1 parent).
-* an svn repository subdirectory can be shared in a git repository between
-  different git repositories (if have has no recursion), but only one git
-  repository can be writable in a project (all not leaf repositories must
-  be associated with the same SVN repository, but can be associated with
-  different GIT repositories).
-  The shared one repository can be not leaf repository only in one project, in
-  all other projects it must be a leaf repository because it has to be readonly
-  there.
-* changes in child git repositories automatically merges altogether into a
-  parent git repository to a single commit which becomes a child commit for
-  merge into a parent-parent repository and so on
-* a checkout of a commit from the root git repository can include content of
-  all child git repositories recursively (as a subtree) 
-* author name, email and date applies in a `git commit ...` call instead of in
-  a `git svn fetch ...` call, so the originally fetched git-svn commits can be
-  parents to a local merge commit as is
-  (disabled by default, see the flag `--retain_commit_git_svn_parents`).
-* built-in support of `svn+ssh` protocol through the `ssh-pageant` utility.
-* all empty directories in an svn repository can be translated into git
-  repository(ies) through an empty file.
-* automatic log of almost all scripts in the `pyxvcs` directory through the
-  stdout redirection to an external utility.
-* a log file contains mostly the calls to the svn and git client utilities and
-  can be relatively easy reproduced.
+Path to the python executable has used to run checkout scripts to checkout a
+third party sources.
 
-Cons:
+* PYTHONDONTWRITEBYTECODE
 
-* only the SVN trunk is convertible, branches and tags conversion is not
-  supported.
-* svn externals is not supported and so creation, movement and deletion any
-  of them is not detected and not translated into respective git repository.
-* svn properties does not automatically convert into git representation
-  (`svn:ignore` -> `.gitignore`, `svn:mergeinfo`, etc).
-* SVN author translation is supported only for a single author/email per
-  GIT repository.
-* changes in child git repositories automatically merged in a parent git
-  repository only by the value (subtree), by the reference (submodule)
-  is not supported.
+Python variable to suppress the generation of the byte code directory.
+
+* CHCP
+
+Code page locale variable to make readable all output from the Windows batch
+scripts.
+
+2. `_config/config.private.yaml`
+
+Python script private variables file designed to declare user name, user email,
+source code hub per a version control system and declare basic project paths
+structure for a source code checkout. Can declare paths to checkout from public
+or private repositories.
+
+Stores these set of variables:
+
+* `SVN_SF.HUB_ROOT`
+
+Particulary for the Sourceforge the hub root path.
+
+* `SVN_SF.HUB_ABBR`
+
+Particularly for the Sourceforge the hub abbreviated name used to generate and
+use the source code scripts to checkout or pull.
+
+* `SVN_SF.USER`
+
+Particularly for the Sourceforge the user name used to checkout the source code
+from respective repository.
+
+* `SVN_SF.PROJECT_PATH_LIST`
+
+Particularly for the Sourceforge the project paths list there to generate
+configuration files and checkout scripts.
+
+3. `_config/config.yaml`
+
+Python script root variables file designed to declare particular variables
+related to a context like ssh protocol, local cache, git-svn conversion and
+etc. Generates together with the same files addressed by the project paths
+from all `*.PROJECT_PATH_LIST` variables.
+
+Stores these set of variables:
+
+* `SVN_SSH_ENABLED` or `GIT_SSH_ENABLED`
+
+Enables SSH key usage for a particular version control system.
+An appropriate protocol utilizes the ssh key must be already applied to all
+related urls begins, for example, by `svn+ssh://` or `git+ssh://`.
+It you don't not use respective ssh protocols, they you not need these
+variables.
+
+* `SVN_SSH_AGENT` or `GIT_SSH_AGENT` or `GIT_SVN_SSH_AGENT`
+
+Different SSH agent applications uses the SSH key with a particular version
+control system like SVN or GIT.
+These variables basically stores paths which is addressed from `SVN_SSH` and
+`GIT_SSH` environment variables together with the user name has used to
+checkout the source code.
+It you don't not use respective ssh protocols, they you not need these
+variables.
+
+* `LOCAL_CACHE_ROOT`
+
+Local cache storage for respective python scripts.
+
+3. `_config/config.env.yaml`
+
+Python script environment variables file designed to declare environment
+variables for particular or all external processes being called from python
+scripts.
+
+Each variable in this script has special format to declare conditional
+environment variables.
+
+Format 1:
+
+<var>: "<string_value>"
+<var>: '<string_value>'
+<var>: [<command_line_list>]
+
+Format 2:
+
+<var>:
+  apps: [<application_absolute_path_list_for_which_variable_is_declared>]
+  value: <a_value>
+
+Format 3:
+
+<var>:
+  if: '<python_condition>'
+  apps: [<application_absolute_path_list_for_which_variable_is_declared>]
+  values:
+    - if: '<python_condition_1>'
+      value: [<command_line_list_for_a_condition_1>]
+    :
+    - if: '<python_condition_N>'
+      value: [<command_line_list_for_a_condition_N>]
+
+Stores these set of variables:
+
+* `SVN_SSH` or `GIT_SSH`
+
+Stores command lines for particular SSH agent.
 
 -------------------------------------------------------------------------------
 8. PRECONFIGURE
@@ -330,15 +393,16 @@ From the `_pyxvcs` directory:
    variables to mirror from svn to git under an unique account
    (will be shown in a merge info after a merge).
    Edit all other variables from the `config.private.yaml` file.
-3. Run the `03_configure.yaml.*` script.
+3. Run the `03_configure.root_yaml.*` script.
    Edit `SVN_SSH_ENABLED` and `GIT_SSH_ENABLED` variables to properly
    enable/disable ssh protocol usage from the svn/git utilities.
    Edit `SVN_SSH_AGENT`, `GIT_SSH_AGENT`, `GIT_SVN_SSH_AGENT` variables related
    to the ssh protocol.
+4. Run the `04_configure.project_yaml.*` script.
    Edit the `WCROOT_OFFSET` variable in the respective `config.yaml` file
    and change the default working copies directory structure if is required to.
    Edit all other variables in `config.yaml` and `config.env.yaml` files.
-4. Run the `04_configure.*` script.
+5. Run the `05_configure.*` script.
 
 Note:
   You can run respective configure scripts from a nested directory to apply
@@ -409,7 +473,67 @@ a LOCAL git-svn repository), then these scripts must be issued:
 2. `<HubAbbrivatedName>~git~push_svn_to_git.*`
 
 -------------------------------------------------------------------------------
-11. SSH+SVN/PLINK SETUP
+11. FEATURES
+-------------------------------------------------------------------------------
+
+Currently only several limited features is suppported:
+
+* one-way limited conversion from svn to git (svn2git)
+* svn/git basic commands in a project group context
+* one script per a command in a repository
+
+-------------------------------------------------------------------------------
+11.1. SVN-to-GIT
+-------------------------------------------------------------------------------
+
+Pros:
+
+* access to a remote repository servers only through the svn and git utilities,
+  no need a direct access to a bare repository.
+* a single SVN repository can be splitted into multiple GIT repositories.
+* svn revisions can be represented by the git commits in a not linear history
+  (a git commit with more than 1 parent).
+* an svn repository subdirectory can be shared in a git repository between
+  different git repositories (if have has no recursion), but only one git
+  repository can be writable in a project (all not leaf repositories must
+  be associated with the same SVN repository, but can be associated with
+  different GIT repositories).
+  The shared one repository can be not leaf repository only in one project, in
+  all other projects it must be a leaf repository because it has to be readonly
+  there.
+* changes in child git repositories automatically merges altogether into a
+  parent git repository to a single commit which becomes a child commit for
+  merge into a parent-parent repository and so on
+* a checkout of a commit from the root git repository can include content of
+  all child git repositories recursively (as a subtree) 
+* author name, email and date applies in a `git commit ...` call instead of in
+  a `git svn fetch ...` call, so the originally fetched git-svn commits can be
+  parents to a local merge commit as is
+  (disabled by default, see the flag `--retain_commit_git_svn_parents`).
+* built-in support of `svn+ssh` protocol through the `ssh-pageant` utility.
+* all empty directories in an svn repository can be translated into git
+  repository(ies) through an empty file.
+* automatic log of almost all scripts in the `pyxvcs` directory through the
+  stdout redirection to an external utility.
+* a log file contains mostly the calls to the svn and git client utilities and
+  can be relatively easy reproduced.
+
+Cons:
+
+* only the SVN trunk is convertible, branches and tags conversion is not
+  supported.
+* svn externals is not supported and so creation, movement and deletion any
+  of them is not detected and not translated into respective git repository.
+* svn properties does not automatically convert into git representation
+  (`svn:ignore` -> `.gitignore`, `svn:mergeinfo`, etc).
+* SVN author translation is supported only for a single author/email per
+  GIT repository.
+* changes in child git repositories automatically merged in a parent git
+  repository only by the value (subtree), by the reference (submodule)
+  is not supported.
+
+-------------------------------------------------------------------------------
+12. SSH+SVN/PLINK SETUP
 -------------------------------------------------------------------------------
 Based on: https://stackoverflow.com/questions/11345868/how-to-use-git-svn-with-svnssh-url/58641860#58641860
 
@@ -484,17 +608,17 @@ NOTE:
   files.
 
 -------------------------------------------------------------------------------
-12. KNOWN ISSUES
+13. KNOWN ISSUES
 -------------------------------------------------------------------------------
 For the issues around python xonsh module see details in the
 `README_EN.python_xonsh.known_issues.txt` file.
 
 -------------------------------------------------------------------------------
-12.1. svn+ssh issues
+13.1. svn+ssh issues
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-12.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
+13.1.1. Message `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E170012: Can't create tunnel`
 -------------------------------------------------------------------------------
 
@@ -526,7 +650,7 @@ Solution:
 Manually edit variables in the file for correct values.
 
 -------------------------------------------------------------------------------
-12.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
+13.1.2. Message `Can't create session: Unable to connect to a repository at URL 'svn+ssh://...': `
         `To better debug SSH connection problems, remove the -q option from ssh' in the [tunnels] section of your Subversion configuration file. `
         `at .../Git/mingw64/share/perl5/Git/SVN.pm line 310.'`
 -------------------------------------------------------------------------------
@@ -548,7 +672,7 @@ NOTE:
   the respective configuration files.
 
 -------------------------------------------------------------------------------
-12.1.3. Message `Keyboard-interactive authentication prompts from server:`
+13.1.3. Message `Keyboard-interactive authentication prompts from server:`
         `svn: E170013: Unable to connect to a repository at URL 'svn+ssh://...'`
         `svn: E210002: To better debug SSH connection problems, remove the -q option from 'ssh' in the [tunnels] section of your Subversion configuration file.`
         `svn: E210002: Network connection closed unexpectedly`
@@ -574,11 +698,11 @@ Solution:
 Read the deatils in the `SSH+SVN/PLINK SETUP` section.
 
 -------------------------------------------------------------------------------
-12.2. Python execution issues
+13.2. Python execution issues
 -------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------
-12.2.1. `OSError: [WinError 6] The handle is invalid`
+-------------------------------------------------------------------------------
+13.2.1. `OSError: [WinError 6] The handle is invalid`
 -------------------------------------------------------------------------------
 
 Issue:
@@ -591,7 +715,7 @@ Solution:
 Reinstall a different python version.
 
 -------------------------------------------------------------------------------
-12.3. pytest execution issues
+13.3. pytest execution issues
 -------------------------------------------------------------------------------
 * `xonsh incorrectly reorders the test for the pytest` :
   https://github.com/xonsh/xonsh/issues/3380
@@ -600,9 +724,8 @@ Reinstall a different python version.
 * `can not order tests by a test directory path` :
   https://github.com/pytest-dev/pytest/issues/6114
 
-
 -------------------------------------------------------------------------------
-12.4. fcache execution issues
+13.4. fcache execution issues
 -------------------------------------------------------------------------------
 * `fcache is not multiprocess aware on Windows` :
   https://github.com/tsroten/fcache/issues/26
@@ -612,6 +735,6 @@ Reinstall a different python version.
   https://github.com/tsroten/fcache/issues/28
 
 -------------------------------------------------------------------------------
-13. AUTHOR
+14. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

@@ -1,17 +1,11 @@
 @echo off
 
-rem rem implementation through the `python` 3.x + `plumbum` module
-rem 
-rem setlocal
-rem 
-rem call "%%~dp0__init__.bat" || exit /b
-rem 
-rem "%PYTHON_EXE_PATH%" "%~dp0configure.xsh" %*
-rem exit /b
-
 setlocal
 
-call "%%~dp0__init__.bat" || goto INIT_EXIT
+call "%%~dp0__init__.bat" || exit /b
+
+set "CONFIGURE_DIR=%~dp0"
+set "CONFIGURE_DIR=%CONFIGURE_DIR:~0,-1%"
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
 
@@ -34,31 +28,11 @@ exit /b
 :IMPL
 set /A NEST_LVL+=1
 
-rem no local logging if nested call
-call :CMD "%%PYTHON_EXE_PATH%%" "%%~dp0configure.xsh" %%*
-goto EXIT
-
-:CMD
-echo.^>%*
-echo.
-(
-  %*
-)
-exit /b
-
-:EXIT
+call "%%PYXVCS_SCRIPTS_ROOT%%\%%CONFIGURE_BASE_SCRIPT_FILE_NAME%%" "%%CONFIGURE_DIR%%" bat --gen_root_yaml %%*
 set LASTERROR=%ERRORLEVEL%
 
-rem to prevent pause call under logging
 set /A NEST_LVL-=1
 
 if %NEST_LVL% LEQ 0 pause
-
-exit /b %LASTERROR%
-
-:INIT_EXIT
-set LASTERROR=%ERRORLEVEL%
-
-if %NEST_LVL%0 EQU 0 pause
 
 exit /b %LASTERROR%

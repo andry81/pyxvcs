@@ -1,11 +1,11 @@
-import os, sys, platform, shutil, inspect, argparse
+import os, sys, shutil, inspect, argparse
 #from datetime import datetime
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
 SOURCE_DIR = os.path.dirname(SOURCE_FILE)
 
 # portable import to the global space
-sys.path.append(SOURCE_DIR + '/tools/tacklelib')
+sys.path.append(SOURCE_DIR + '/tools/python/tacklelib')
 import tacklelib as tkl
 
 tkl.tkl_init(tkl, global_config = {'log_import_module':os.environ.get('TACKLELIB_LOG_IMPORT_MODULE')})
@@ -16,6 +16,7 @@ sys.path.pop()
 
 
 tkl_declare_global('CONFIGURE_DIR', sys.argv[1].replace('\\', '/') if len(sys.argv) >= 2 else '')
+tkl_declare_global('SHELL_EXT', sys.argv[2] if len(sys.argv) >= 3 else '')
 
 # format: [(<header_str>, <stderr_str>), ...]
 tkl_declare_global('g_registered_ignored_errors', []) # must be not empty value to save the reference
@@ -31,6 +32,9 @@ if not os.path.isdir(CONFIGURE_ROOT):
 if not os.path.isdir(CONFIGURE_DIR):
   raise Exception('CONFIGURE_DIR directory does not exist: `{0}`'.format(CONFIGURE_DIR))
 
+if SHELL_EXT == '':
+  raise Exception('shell file extension must be not empty')
+
 #try:
 #  os.mkdir(os.path.join(CONFIGURE_DIR, '.log'))
 #except:
@@ -39,34 +43,42 @@ if not os.path.isdir(CONFIGURE_DIR):
 def get_supported_scm_list():
   return ['svn', 'git']
 
-def validate_vars(configure_dir):
+def validate_vars(configure_dir, shell_ext):
   if configure_dir == '':
-    print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
+    tkl.print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
     exit(1)
 
   if configure_dir[-1:] in ['\\', '/']:
     configure_dir = configure_dir[:-1]
 
   if not os.path.isdir(configure_dir):
-    print_err("{0}: error: configure directory does not exist: `{1}`.".format(sys.argv[0], configure_dir))
+    tkl.print_err("{0}: error: configure directory does not exist: `{1}`.".format(sys.argv[0], configure_dir))
     exit(2)
+
+  if shell_ext == '':
+    tkl.print_err("{0}: error: shell file extension must be not empty.".format(sys.argv[0], shell_ext))
+    exit(3)
 
   return (configure_dir)
 
-def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repos_list = True, generate_scripts = True):
+def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False, generate_git_repos_list = True, generate_scripts = True):
   print("configure: entering `{0}`".format(configure_dir))
 
   with tkl.OnExit(lambda: print("configure: leaving `{0}`\n---".format(configure_dir))):
     if configure_dir == '':
-      print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
+      tkl.print_err("{0}: error: configure directory is not defined.".format(sys.argv[0]))
       exit(1)
 
-    configure_dir = validate_vars(configure_dir)
+    configure_dir = validate_vars(configure_dir, shell_ext)
+
+    if not generate_project_yaml and not generate_git_repos_list and not generate_scripts:
+      # nothing to do
+      return 0
 
     # 1. generate configuration files in the directory
 
     try:
-      if generate_yaml:
+      if generate_project_yaml:
         for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
           if not os.path.exists(config_dir):
             continue
@@ -103,9 +115,7 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
           configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
           is_configure_dir_not_below_script_dir = tkl.is_file_path_beginswith(root_configure_dir_relpath + '/', configure_dir_relpath + '/')
           if not is_configure_dir_not_below_script_dir:
-            if platform.system() == 'Windows':
-              shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.bat.in'), os.path.join(configure_dir, '__init__.bat'))
-            shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.sh.in'), os.path.join(configure_dir, '__init__.sh'))
+            shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.' + shell_ext + '.in'), os.path.join(configure_dir, '__init__.' + shell_ext))
 
     except:
       # `exit` with the parentheses to workaround the issue:
@@ -175,7 +185,7 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
               for dirpath, dirs, files in os.walk(TMPL_CMDOP_FILES_DIR):
                 for file in files:
                   if tkl.is_file_path_beginswith(file, '{HUB}~' + scm + '~') and \
-                     tkl.is_file_path_endswith(file, '.in'):
+                     tkl.is_file_path_endswith(file, '.' + shell_ext + '.in'):
                     tmpl_cmdop_files_tuple_list.append((scm_token_upper, file, file[:file.rfind('.')].format(HUB = value)))
 
                 dirs.clear() # not recursively
@@ -217,8 +227,8 @@ def configure(configure_dir, bare_args, generate_yaml = False, generate_git_repo
         if not is_cmdop_dir_in_project_path_list:
           continue
 
-        nested_ret = configure(nested_cmd_dir, bare_args,
-          generate_yaml = generate_yaml,
+        nested_ret = configure(nested_cmd_dir, shell_ext, bare_args,
+          generate_project_yaml = generate_project_yaml,
           generate_git_repos_list = generate_git_repos_list,
           generate_scripts = generate_scripts)
 
@@ -245,22 +255,22 @@ def on_main_exit():
       print(registered_ignored_error[1])
       print('---')
 
-def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwargs):
+def main(configure_root, configure_dir, shell_ext, bare_args, generate_root_yaml = False, generate_project_yaml = False, **kwargs):
   with tkl.OnExit(on_main_exit):
-    configure_dir = validate_vars(configure_dir)
+    configure_dir = validate_vars(configure_dir, shell_ext)
 
     configure_dir_relpath = os.path.relpath(configure_dir, configure_root).replace('\\', '/')
     configure_dir_relpath_comp_list = configure_dir_relpath.split('/')
     configure_dir_relpath_comp_list_size = len(configure_dir_relpath_comp_list)
 
-    # load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
+    # generate (optional) and load `config.yaml` from `configure_root` up to `configure_dir` (excluded) directory
     if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
 
         if os.path.exists(config_dir + '/config.yaml.in'):
-          if generate_yaml:
+          if generate_root_yaml:
             shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
 
           yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
@@ -275,21 +285,21 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
             continue
 
           if os.path.exists(config_dir + '/config.yaml.in'):
-            if generate_yaml:
+            if generate_project_yaml:
               shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
 
             yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
               search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
             break # break on success
 
-    # load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
+    # generate (optional) and load `config.env.yaml` from `configure_root` up to `configure_dir` (excluded) directory
     if configure_dir_relpath_comp_list_size > 1:
       for config_dir in [configure_root + '/' + LOCAL_CONFIG_DIR_NAME, configure_root]:
         if not os.path.exists(config_dir):
           continue
 
         if os.path.exists(config_dir + '/config.env.yaml.in'):
-          if generate_yaml:
+          if generate_root_yaml:
             shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
 
           yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
@@ -304,14 +314,14 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
             continue
 
           if os.path.exists(config_dir + '/config.env.yaml.in'):
-            if generate_yaml:
+            if generate_project_yaml:
               shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
 
             yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
               search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
             break # break on success
 
-    configure(configure_dir, bare_args, generate_yaml = generate_yaml, **kwargs)
+    configure(configure_dir, shell_ext, bare_args, generate_project_yaml = generate_project_yaml, **kwargs)
 
 # CAUTION:
 #   Temporary disabled because of issues in the python xonsh module.
@@ -325,11 +335,12 @@ def main(configure_root, configure_dir, bare_args, generate_yaml = False, **kwar
 if __name__ == '__main__':
   # parse arguments
   arg_parser = argparse.ArgumentParser()
-  arg_parser.add_argument('--gen_yaml', action = 'store_true')                  # generate public `*.yaml` scripts, except `*.private.yaml` scripts
+  arg_parser.add_argument('--gen_root_yaml', action = 'store_true')             # generate public root `*.yaml` scripts, except `*.private.yaml` scripts
+  arg_parser.add_argument('--gen_project_yaml', action = 'store_true')          # generate project `*.yaml` scripts
   arg_parser.add_argument('--gen_git_repos_list', action = 'store_true')        # generate `git_repos.lst` configuration files
   arg_parser.add_argument('--gen_scripts', action = 'store_true')               # generate command script files
 
-  known_args, unknown_args = arg_parser.parse_known_args(sys.argv[2:])
+  known_args, unknown_args = arg_parser.parse_known_args(sys.argv[3:])
 
   for unknown_arg in unknown_args:
     unknown_arg = unknown_arg.lstrip('-')
@@ -338,8 +349,9 @@ if __name__ == '__main__':
         raise Exception('frontend argument is unsafely intersected with the backend argument, you should use an unique name to avoid that: frontrend=`{0}` backend=`{1}`'.format(known_arg, unknown_arg))
 
   main(
-    CONFIGURE_ROOT, CONFIGURE_DIR, unknown_args,
-    generate_yaml = known_args.gen_yaml,
+    CONFIGURE_ROOT, CONFIGURE_DIR, SHELL_EXT, unknown_args,
+    generate_root_yaml = known_args.gen_root_yaml,
+    generate_project_yaml = known_args.gen_project_yaml,
     generate_git_repos_list = known_args.gen_git_repos_list,
     generate_scripts = known_args.gen_scripts
   )
