@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.04.06
+* 2020.04.05
 * pyxvcs
 
 1. DESCRIPTION
