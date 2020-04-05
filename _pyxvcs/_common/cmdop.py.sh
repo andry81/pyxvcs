@@ -33,7 +33,7 @@ function cmdop()
 
     (
     (
-      exec $0 "$@"
+      cmdop "$@"
     ) | tee -a "$CONFIGURE_DIR/.log/${LOG_FILE_NAME_SUFFIX}.${BASH_SOURCE_FILE_NAME}.log" 2>&1
     ) 1>&3 2>&4
 

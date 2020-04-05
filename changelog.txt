@@ -1,4 +1,9 @@
 2020.04.05:
+* fixed: text files accidental reformat in the `shutil.copyfile` function
+* fixed: _common: invalid recursive call using `$0` argument
+* fixed: missed changes
+
+2020.04.05:
 * new: bash configure and project scripts
 * new: configure scripts self logging
 * new: tools: `load_config.*` scripts supports new syntax like `[<attribute> ]<var>[:<platform>][=<value>]` to declare an environment variable per specific platform with optional `export` variable attribute

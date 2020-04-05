@@ -84,7 +84,8 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
             continue
 
           if os.path.isfile(os.path.join(config_dir, 'config.yaml.in')):
-            shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+            with open(os.path.join(config_dir, 'config.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.yaml'), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
             break # break on success
 
         for config_dir in [configure_dir + '/' + LOCAL_CONFIG_DIR_NAME, configure_dir]:
@@ -92,7 +93,8 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
             continue
 
           if os.path.isfile(os.path.join(config_dir, 'config.env.yaml.in')):
-            shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+            with open(os.path.join(config_dir, 'config.env.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.env.yaml'), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
             break # break on success
 
       if generate_git_repos_list:
@@ -101,7 +103,8 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
             continue
 
           if os.path.isfile(os.path.join(config_dir, 'git_repos.lst.in')):
-            shutil.copyfile(os.path.join(config_dir, 'git_repos.lst.in'), os.path.join(config_dir, 'git_repos.lst'))
+            with open(os.path.join(config_dir, 'git_repos.lst.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'git_repos.lst'), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
             break # break on success
 
       if generate_scripts:
@@ -115,7 +118,8 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
           configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
           is_configure_dir_not_below_script_dir = tkl.is_file_path_beginswith(root_configure_dir_relpath + '/', configure_dir_relpath + '/')
           if not is_configure_dir_not_below_script_dir:
-            shutil.copyfile(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.' + shell_ext + '.in'), os.path.join(configure_dir, '__init__.' + shell_ext))
+            with open(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.' + shell_ext + '.in'), 'rb') as fsrc, open(os.path.join(configure_dir, '__init__.' + shell_ext), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
 
     except:
       # `exit` with the parentheses to workaround the issue:
@@ -198,9 +202,9 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
         out_file_name = tmpl_cmdop_files_tuple[2]
         in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
         out_file_path = os.path.join(configure_dir, out_file_name).replace('\\', '/')
-        with open(in_file_path, 'rt') as in_file, open(out_file_path, 'wt') as out_file:
+        with open(in_file_path, 'rb') as in_file, open(out_file_path, 'wb') as out_file:
           in_file_content = in_file.read()
-          out_file.write(in_file_content.format(SCM_TOKEN = scm_token_upper))
+          out_file.write(in_file_content.replace(b'{SCM_TOKEN}', scm_token_upper.encode('utf-8')))
 
     # 4. Call a nested command if a nested directory is in the project paths list.
 
@@ -271,7 +275,8 @@ def main(configure_root, configure_dir, shell_ext, bare_args, generate_root_yaml
 
         if os.path.exists(config_dir + '/config.yaml.in'):
           if generate_root_yaml:
-            shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+            with open(os.path.join(config_dir, 'config.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.yaml'), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
 
           yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
             search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
@@ -286,7 +291,8 @@ def main(configure_root, configure_dir, shell_ext, bare_args, generate_root_yaml
 
           if os.path.exists(config_dir + '/config.yaml.in'):
             if generate_project_yaml:
-              shutil.copyfile(os.path.join(config_dir, 'config.yaml.in'), os.path.join(config_dir, 'config.yaml'))
+              with open(os.path.join(config_dir, 'config.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.yaml'), 'wb') as fdst:
+                shutil.copyfileobj(fsrc, fdst)
 
             yaml_load_config(config_dir, 'config.yaml', to_globals = True, to_environ = False,
               search_by_global_pred_at_third = lambda var_name: getglobalvar(var_name))
@@ -300,7 +306,8 @@ def main(configure_root, configure_dir, shell_ext, bare_args, generate_root_yaml
 
         if os.path.exists(config_dir + '/config.env.yaml.in'):
           if generate_root_yaml:
-            shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+            with open(os.path.join(config_dir, 'config.env.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.env.yaml'), 'wb') as fdst:
+              shutil.copyfileobj(fsrc, fdst)
 
           yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
             search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
@@ -315,7 +322,8 @@ def main(configure_root, configure_dir, shell_ext, bare_args, generate_root_yaml
 
           if os.path.exists(config_dir + '/config.env.yaml.in'):
             if generate_project_yaml:
-              shutil.copyfile(os.path.join(config_dir, 'config.env.yaml.in'), os.path.join(config_dir, 'config.env.yaml'))
+              with open(os.path.join(config_dir, 'config.env.yaml.in'), 'rb') as fsrc, open(os.path.join(config_dir, 'config.env.yaml'), 'wb') as fdst:
+                shutil.copyfileobj(fsrc, fdst)
 
             yaml_load_config(config_dir, 'config.env.yaml', to_globals = False, to_environ = True,
               search_by_environ_pred_at_third = lambda var_name: getglobalvar(var_name))
