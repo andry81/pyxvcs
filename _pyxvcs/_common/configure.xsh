@@ -25,6 +25,7 @@ tkl_declare_global('g_registered_ignored_errors', []) # must be not empty value 
 tkl_source_module(SOURCE_DIR, '__init__.xsh')
 
 tkl_import_module(TACKLELIB_ROOT, 'tacklelib.utils.py', 'tkl')
+tkl_import_module(CMDOPLIB_ROOT, 'cmdoplib.std.xsh', 'cmdop')
 
 if not os.path.isdir(CONFIGURE_ROOT):
   raise Exception('CONFIGURE_ROOT directory does not exist: `{0}`'.format(CONFIGURE_ROOT))
@@ -61,7 +62,7 @@ def validate_vars(configure_dir, shell_ext):
 
   return (configure_dir)
 
-def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False, generate_git_repos_list = True, generate_scripts = True):
+def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False, generate_git_repos_list = True, generate_scripts = True, chmod_scripts = False):
   print("configure: entering `{0}`".format(configure_dir))
 
   with tkl.OnExit(lambda: print("configure: leaving `{0}`\n---".format(configure_dir))):
@@ -71,7 +72,7 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
     configure_dir = validate_vars(configure_dir, shell_ext)
 
-    if not generate_project_yaml and not generate_git_repos_list and not generate_scripts:
+    if not generate_project_yaml and not generate_git_repos_list and not generate_scripts and not chmod_scripts:
       # nothing to do
       return 0
 
@@ -107,7 +108,7 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
               shutil.copyfileobj(fsrc, fdst)
             break # break on success
 
-      if generate_scripts:
+      if generate_scripts or chmod_scripts:
         # CAUTION:
         #   We must generate `__init__` scripts in all project paths hierarchy:
         #   1. Except the root, which has to exist separately.
@@ -118,8 +119,14 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
           configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
           is_configure_dir_not_below_script_dir = tkl.is_file_path_beginswith(root_configure_dir_relpath + '/', configure_dir_relpath + '/')
           if not is_configure_dir_not_below_script_dir:
-            with open(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.' + shell_ext + '.in'), 'rb') as fsrc, open(os.path.join(configure_dir, '__init__.' + shell_ext), 'wb') as fdst:
-              shutil.copyfileobj(fsrc, fdst)
+            out_file_path = os.path.join(configure_dir, '__init__.' + shell_ext).replace('\\', '/')
+            if generate_scripts:
+              with open(os.path.join(TMPL_CMDOP_FILES_DIR, '__init__.' + shell_ext + '.in'), 'rb') as fsrc, open(out_file_path, 'wb') as fdst:
+                shutil.copyfileobj(fsrc, fdst)
+            if chmod_scripts:
+              # update script permissions by the chmod utility
+              cmdop.call('chmod', ['ug+x', out_file_path], stdout = sys.stdout, stderr = sys.stderr)
+              cmdop.call('chmod', ['-R', 'ug+rw', out_file_path], stdout = sys.stdout, stderr = sys.stderr)
 
     except:
       # `exit` with the parentheses to workaround the issue:
@@ -173,7 +180,7 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
           all_project_paths_set.update(project_path_list)
 
-          if generate_scripts:
+          if generate_scripts or chmod_scripts:
             configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
 
             if len(configure_dir_relpath) > 0 and configure_dir_relpath != '.':
@@ -194,17 +201,22 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
                 dirs.clear() # not recursively
 
-    if generate_scripts:
+    if generate_scripts or chmod_scripts:
       # generate vcs command scripts
       for tmpl_cmdop_files_tuple in tmpl_cmdop_files_tuple_list:
-        scm_token_upper = tmpl_cmdop_files_tuple[0]
-        in_file_name = tmpl_cmdop_files_tuple[1]
         out_file_name = tmpl_cmdop_files_tuple[2]
-        in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
         out_file_path = os.path.join(configure_dir, out_file_name).replace('\\', '/')
-        with open(in_file_path, 'rb') as in_file, open(out_file_path, 'wb') as out_file:
-          in_file_content = in_file.read()
-          out_file.write(in_file_content.replace(b'{SCM_TOKEN}', scm_token_upper.encode('utf-8')))
+        if generate_scripts:
+          scm_token_upper = tmpl_cmdop_files_tuple[0]
+          in_file_name = tmpl_cmdop_files_tuple[1]
+          in_file_path = os.path.join(TMPL_CMDOP_FILES_DIR, in_file_name).replace('\\', '/')
+          with open(in_file_path, 'rb') as in_file, open(out_file_path, 'wb') as out_file:
+            in_file_content = in_file.read()
+            out_file.write(in_file_content.replace(b'{SCM_TOKEN}', scm_token_upper.encode('utf-8')))
+        if chmod_scripts:
+          # update script permissions by the chmod utility
+          cmdop.call('chmod', ['ug+x', out_file_path], stdout = sys.stdout, stderr = sys.stderr)
+          cmdop.call('chmod', ['-R', 'ug+rw', out_file_path], stdout = sys.stdout, stderr = sys.stderr)
 
     # 4. Call a nested command if a nested directory is in the project paths list.
 
@@ -234,7 +246,8 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
         nested_ret = configure(nested_cmd_dir, shell_ext, bare_args,
           generate_project_yaml = generate_project_yaml,
           generate_git_repos_list = generate_git_repos_list,
-          generate_scripts = generate_scripts)
+          generate_scripts = generate_scripts,
+          chmod_scripts = chmod_scripts)
 
         if nested_ret:
           ret |= 2
@@ -347,6 +360,7 @@ if __name__ == '__main__':
   arg_parser.add_argument('--gen_project_yaml', action = 'store_true')          # generate project `*.yaml` scripts
   arg_parser.add_argument('--gen_git_repos_list', action = 'store_true')        # generate `git_repos.lst` configuration files
   arg_parser.add_argument('--gen_scripts', action = 'store_true')               # generate command script files
+  arg_parser.add_argument('--chmod_scripts', action = 'store_true')             # set permissions for command script files
 
   known_args, unknown_args = arg_parser.parse_known_args(sys.argv[3:])
 
@@ -361,5 +375,6 @@ if __name__ == '__main__':
     generate_root_yaml = known_args.gen_root_yaml,
     generate_project_yaml = known_args.gen_project_yaml,
     generate_git_repos_list = known_args.gen_git_repos_list,
-    generate_scripts = known_args.gen_scripts
+    generate_scripts = known_args.gen_scripts,
+    chmod_scripts = known_args.chmod_scripts
   )

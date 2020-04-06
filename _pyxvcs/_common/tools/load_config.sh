@@ -55,7 +55,8 @@ function load_config()
   local __VALUE
   while IFS='=' read -r __VAR __VALUE; do
     # trim trailing line feeds
-    __VAR="${__VAR//$'\r'/}"
+    __VAR="${__VAR%$'\r'}"
+    __VALUE="${__VALUE%$'\r'}"
 
     [[ -z "$__VAR" ]] && continue
     [[ "$__VAR" =~ ^[[:space:]]*# ]] && continue # ignore prefix (not postfix) comments

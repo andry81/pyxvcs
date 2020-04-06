@@ -1,3 +1,10 @@
+2020.04.06:
+* new: 06_configure.chmod_scripts.sh: script permissions update
+* new: `install_python_modules.sh` script to install python modules in the Linux shell all together
+* fixed: _common: tools: load_config.sh: incomplete trim trailing line feeds
+* changed: install_python_modules.*: use first parameter as a path to the installed python executable
+* changed: readme update
+
 2020.04.05:
 * fixed: text files accidental reformat in the `shutil.copyfile` function
 * fixed: _common: invalid recursive call using `$0` argument

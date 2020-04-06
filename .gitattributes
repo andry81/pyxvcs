@@ -11,6 +11,7 @@ _pyxvcs/04_configure.project_yaml.bat -text
 _pyxvcs/04_configure.project_yaml.sh -text
 _pyxvcs/05_configure.bat -text
 _pyxvcs/05_configure.sh -text
+_pyxvcs/06_configure.chmod.sh -text
 _pyxvcs/__init__.bat -text
 _pyxvcs/__init__.sh -text
 _pyxvcs/__init__.xsh -text
@@ -59,6 +60,7 @@ _pyxvcs/_config/tmpl/{HUB}~svn~relocate.sh.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~update.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~update.sh.in -text
 _pyxvcs/install_python_modules.bat -text
+_pyxvcs/install_python_modules.sh -text
 _pyxvcs/project_group/config.yaml.in -text
 _pyxvcs/project_group/project/config.yaml.in -text
 _pyxvcs/project_group/project/git_repos.lst.in -text
