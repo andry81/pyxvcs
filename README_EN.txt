@@ -192,6 +192,11 @@ NOTE: Make a script executable in the Linux:
   sudo chmod ug+x <script>
   sudo chmod o+r <script>
 
+NOTE:
+  To install python all required modules at once you can use
+  `install_python_modules.*` script as:
+  `install_python_modules.* <path-to-pathon-executable>`
+
 -------------------------------------------------------------------------------
 6. CATALOG CONTENT DESCRIPTION
 -------------------------------------------------------------------------------
