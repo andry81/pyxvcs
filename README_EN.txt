@@ -423,7 +423,7 @@ From the `_pyxvcs` directory:
    Edit all other variables in `config.yaml` and `config.env.yaml` files.
 5. Run the `05_configure.*` script.
 6. (Only in case of usage the Linux like environment)
-   Run the `06_configure.chmod_scripts.*` script.
+   Run the `06_configure.chmod.*` script.
 
 Note:
   Step 6 must be issued in the terminal with appropriate permissions.
