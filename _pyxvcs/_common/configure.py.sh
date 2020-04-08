@@ -31,16 +31,19 @@ function configure()
         ;;
     esac
 
-    (
-    (
-      configure "$@"
-    ) | tee -a "$CONFIGURE_DIR/.log/${LOG_FILE_NAME_SUFFIX}.${BASH_SOURCE_FILE_NAME}.log" 2>&1
-    ) 1>&3 2>&4
+    # stdout+stderr redirection into the same log file with handles restore
+    {
+    {
+    {
+      configure "$@" 2>&1 1>&8
+    } | tee -a "$CONFIGURE_DIR/.log/${LOG_FILE_NAME_SUFFIX}.${BASH_SOURCE_FILE_NAME}.log" 1>&9
+    } 8>&1 | tee "$CONFIGURE_DIR/.log/${LOG_FILE_NAME_SUFFIX}.${BASH_SOURCE_FILE_NAME}.log"
+    } 9>&2
 
     exit $?
   }
 
-  # no local logging if nested call
+  # always calls as an external process without an inprocess call optimization
   tkl_call "$PYTHON_EXE_PATH" "$BASH_SOURCE_DIR/configure.xsh" "$@"
   tkl_set_error $?
 
