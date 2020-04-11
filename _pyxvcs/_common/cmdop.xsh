@@ -162,7 +162,9 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
         if scm_type == 'svn':
           if hasglobalvar(scm_token + '.WCROOT_DIR'):
-            if cmd_token == 'update':
+            if cmd_token == 'cleanup':
+              nested_ret = cmdoplib_svn.svn_cleanup(configure_dir, scm_token, bare_args, verbosity = verbosity)
+            elif cmd_token == 'update':
               nested_ret = cmdoplib_svn.svn_update(configure_dir, scm_token, bare_args, verbosity = verbosity)
             elif cmd_token == 'checkout':
               nested_ret = cmdoplib_svn.svn_checkout(configure_dir, scm_token, bare_args, verbosity = verbosity)

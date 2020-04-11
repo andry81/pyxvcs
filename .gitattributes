@@ -53,6 +53,8 @@ _pyxvcs/_config/tmpl/{HUB}~git~reset.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~git~reset.sh.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~checkout.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~checkout.sh.in -text
+_pyxvcs/_config/tmpl/{HUB}~svn~cleanup.bat.in -text
+_pyxvcs/_config/tmpl/{HUB}~svn~cleanup.sh.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~makedirs.bat.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~makedirs.sh.in -text
 _pyxvcs/_config/tmpl/{HUB}~svn~relocate.bat.in -text
