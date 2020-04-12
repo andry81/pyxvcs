@@ -6,7 +6,7 @@
 1.1. issues with the pipe `|` operator
 1.2. isseus with the `@(...)` operator
 1.3. issues with another modules
-2. AUTHOR EMAIL
+2. AUTHOR
 
 -------------------------------------------------------------------------------
 1. KNOWN ISSUES
@@ -45,6 +45,6 @@ https://github.com/xonsh/xonsh/issues/3190 : "module `cmdix` executables is not 
 https://github.com/xonsh/xonsh/issues/3189 : "module `cmdix`/`yes` can not be interrupted (ctrl+c) from the python evaluation command `@(...)`"
 
 -------------------------------------------------------------------------------
-2. AUTHOR EMAIL
+2. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
