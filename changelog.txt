@@ -1,4 +1,8 @@
 2020.04.20:
+* fixed: cmdop: removed check on a `*.HUB_ROOT` variable existence, because in case of a local storage (local filesystem) it may not exist and can has a different name like `*.DB_ROOT` (but not a `*.HUB_ABBR` variable, which must always exist)
+* changed: readme update
+
+2020.04.20:
 * fixed: configure, cmdop: traverse over the list of paths from a `*.PROJECT_PATH_LIST` variable as is without sorted order
 
 2020.04.11:

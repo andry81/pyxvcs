@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.04.07
+* 2020.04.20
 * pyxvcs
 
 1. DESCRIPTION
@@ -15,7 +15,8 @@
 10.1. Mirroring (merging) from SVN to GIT
 11. FEATURES
 11.1. SVN-to-GIT
-12. SSH+SVN/PLINK SETUP
+12. THIRD PARTY SETUP
+12.1. ssh+svn/plink setup
 13. KNOWN ISSUES
 13.1. Python execution issues
 13.1.1. `OSError: [WinError 6] The handle is invalid`
@@ -266,7 +267,7 @@ levels:
 
 The `myproject` directory contains configuration files with various
 parameters along with parameters which can be passed to command scripts in
-these directores.
+these directories.
 
 The system loads configuration files in directories from the root to the most
 nested directory.
@@ -306,26 +307,47 @@ source code hub per a version control system and declare basic project paths
 structure for a source code checkout. Can declare paths to checkout from public
 or private repositories.
 
-Stores these set of variables:
+May store these set of variables:
 
 * `SVN_SF.HUB_ROOT`
+* `SVN_LOCAL.DB_ROOT`
+* `GIT_GH.HUB_ROOT`
+* `GIT_LOCAL.DB_ROOT`
+* etc...
 
-Particulary for the Sourceforge the hub root path.
+Respectively the Sourceforge/Github/etc svn/git/etc hub root paths and
+svn/git/etc local database root paths.
 
 * `SVN_SF.HUB_ABBR`
+* `SVN_LOCAL.HUB_ABBR`
+* `GIT_GH.HUB_ABBR`
+* `GIT_LOCAL.HUB_ABBR`
+* etc...
 
-Particularly for the Sourceforge the hub abbreviated name used to generate and
-use the source code scripts to checkout or pull.
+Respectively the Sourceforge/Github/etc svn/git/etc hub abbreviated name and
+svn/git/etc local database abbreviated name.
+
+CAUTION:
+  The variable suffix must stay always the `HUB_ABBR` as a hardcoded
+  placeholder in the code.
 
 * `SVN_SF.USER`
+* `SVN_LOCAL.USER`
+* `GIT_GH.USER`
+* `GIT_LOCAL.USER`
+* etc...
 
-Particularly for the Sourceforge the user name used to checkout the source code
-from respective repository.
+Respectively the Sourceforge/Github/local/etc svn/git/etc user name to
+checkout/pull/etc with.
 
 * `SVN_SF.PROJECT_PATH_LIST`
+* `SVN_LOCAL.PROJECT_PATH_LIST`
+* `GIT_GIT.PROJECT_PATH_LIST`
+* `GIT_LOCAL.PROJECT_PATH_LIST`
+* etc...
 
-Particularly for the Sourceforge the project paths list there to generate
-configuration files and checkout scripts.
+Respectively the Sourceforge/Github/local/etc svn/git/etc project path list
+where to generate configuration files and checkout/pull/etc scripts.
 
 3. `_config/config.yaml`
 
@@ -400,7 +422,6 @@ Stores command lines for particular SSH agent.
 -------------------------------------------------------------------------------
 8. PRECONFIGURE
 -------------------------------------------------------------------------------
-
 N/A
 
 -------------------------------------------------------------------------------
@@ -560,7 +581,11 @@ Cons:
   is not supported.
 
 -------------------------------------------------------------------------------
-12. SSH+SVN/PLINK SETUP
+12. THIRD PARTY SETUP
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+12.1. ssh+svn/plink setup
 -------------------------------------------------------------------------------
 Based on: https://stackoverflow.com/questions/11345868/how-to-use-git-svn-with-svnssh-url/58641860#58641860
 

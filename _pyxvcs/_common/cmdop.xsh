@@ -61,15 +61,10 @@ def validate_vars(configure_dir, scm_token):
     tkl.print_err("{0}: error: configure directory does not exist: `{1}`.".format(sys.argv[0], configure_dir))
     exit(2)
 
-  hub_root_var = scm_token + '.HUB_ROOT'
-  if not hasglobalvar(hub_root_var):
-    tkl.print_err("{0}: error: hub root variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_root_var))
-    exit(3)
-
   hub_abbr_var = scm_token + '.HUB_ABBR'
   if not hasglobalvar(hub_abbr_var):
     tkl.print_err("{0}: error: hub abbrivation variable is not declared for the scm_token as prefix: `{1}`.".format(sys.argv[0], hub_abbr_var))
-    exit(4)
+    exit(3)
 
   hub_abbr = getglobalvar(hub_abbr_var)
   scm_type = scm_token[:3].lower()
