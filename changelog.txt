@@ -1,3 +1,6 @@
+2020.04.20:
+* fixed: configure, cmdop: traverse over the list of paths from a `*.PROJECT_PATH_LIST` variable as is without sorted order
+
 2020.04.11:
 * new: cmdop: svn cleanup functionality and scripts
 

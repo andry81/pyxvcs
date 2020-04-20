@@ -1,4 +1,5 @@
 import os, sys, inspect, argparse
+import collections
 #from datetime import datetime
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
@@ -95,6 +96,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     configure_dir, hub_abbr, scm_type = validate_vars(configure_dir, scm_token)
 
+    configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+
     # 1. load configuration files from the directory
 
     yaml_global_vars_pushed = False
@@ -130,7 +133,7 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
     scm_list = get_supported_scm_list()
 
     scm_project_paths_list = None
-    all_project_paths_set = set()
+    all_project_paths_ordered_dict = collections.OrderedDict()
 
     for scm in scm_list:
       for key, value in g_yaml_globals.expanded_items():
@@ -141,7 +144,7 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
           if scm_type == scm:
             scm_project_paths_list = project_path_list
-          all_project_paths_set.update(project_path_list)
+            all_project_paths_ordered_dict.update(collections.OrderedDict().fromkeys(project_path_list))
 
     # 3. Call a command if a nested directory is in the project paths list.
 
@@ -149,10 +152,8 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     # do action only if not in the root and a command file is present
     if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
-      configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
-
       is_cmdop_dir_in_project_path_list = False
-      for project_path in all_project_paths_set:
+      for project_path in all_project_paths_ordered_dict.keys():
         is_cmdop_dir_in_project_path_list = tkl.compare_file_paths(configure_dir_relpath, project_path)
         if is_cmdop_dir_in_project_path_list:
           break
@@ -226,27 +227,37 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
     # 4. Call a nested command if a nested directory is in the project paths list.
 
+    configure_all_dirs = []
     for dirpath, dirs, files in os.walk(configure_dir):
-      for dir in dirs:
-        dir_str = str(dir)
+      configure_all_dirs.append((dirpath, list(dirs), files))
+      dirs.clear() # not recursively
 
-        # ignore specific directories
-        if dir_str.startswith('.'):
-          continue
+    traversed_cmd_dirs = set()
 
-        nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
+    for project_path in all_project_paths_ordered_dict.keys():
+      is_cmdop_dir_in_project_path_list = False
 
-        configure_dir_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
+      for dirpath, dirs, files in configure_all_dirs:
+        for dir in dirs:
+          dir_str = str(dir)
 
-        is_cmdop_dir_in_project_path_list = False
-        for project_path in all_project_paths_set:
-          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/')
+          # ignore specific directories
+          if dir_str.startswith('.'):
+            continue
+
+          nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
+          if nested_cmd_dir in traversed_cmd_dirs:
+            continue
+
+          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/' + dir+ '/')
           if is_cmdop_dir_in_project_path_list:
             break
 
-        if not is_cmdop_dir_in_project_path_list:
-          continue
+        if is_cmdop_dir_in_project_path_list:
+          break
 
+      if is_cmdop_dir_in_project_path_list:
+        traversed_cmd_dirs.add(nested_cmd_dir)
         nested_ret = cmdop(nested_cmd_dir, scm_token, cmd_token, bare_args,
           git_subtrees_root = git_subtrees_root, svn_subtrees_root = svn_subtrees_root,
           compare_remote_name = compare_remote_name, compare_svn_rev = compare_svn_rev,
@@ -257,8 +268,6 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
 
         if nested_ret:
           ret |= 2
-
-      dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:
       # remove previously added variables and restore previously changed variable values

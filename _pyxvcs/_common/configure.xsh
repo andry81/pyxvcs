@@ -1,4 +1,5 @@
 import os, sys, shutil, inspect, argparse
+import collections
 #from datetime import datetime
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
@@ -76,6 +77,9 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
       # nothing to do
       return 0
 
+    root_configure_dir_relpath = os.path.relpath(CONFIGURE_DIR, CONFIGURE_ROOT).replace('\\', '/')
+    configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
+
     # 1. generate configuration files in the directory
 
     try:
@@ -115,8 +119,6 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
         #   2. Except the directory with the script and above.
         #
         if not tkl.compare_file_paths(configure_dir, CONFIGURE_ROOT):
-          root_configure_dir_relpath = os.path.relpath(CONFIGURE_DIR, CONFIGURE_ROOT).replace('\\', '/')
-          configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
           is_configure_dir_not_below_script_dir = tkl.is_file_path_beginswith(root_configure_dir_relpath + '/', configure_dir_relpath + '/')
           if not is_configure_dir_not_below_script_dir:
             out_file_path = os.path.join(configure_dir, '__init__.' + shell_ext).replace('\\', '/')
@@ -168,7 +170,7 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
     scm_list = get_supported_scm_list()
 
-    all_project_paths_set = set()
+    all_project_paths_ordered_dict = collections.OrderedDict()
     tmpl_cmdop_files_tuple_list = []
 
     for scm in scm_list:
@@ -178,11 +180,9 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
           project_path_list = g_yaml_globals.get_expanded_value(scm_token_upper + '.PROJECT_PATH_LIST')
 
-          all_project_paths_set.update(project_path_list)
+          all_project_paths_ordered_dict.update(collections.OrderedDict().fromkeys(project_path_list))
 
           if generate_scripts or chmod_scripts:
-            configure_dir_relpath = os.path.relpath(configure_dir, CONFIGURE_ROOT).replace('\\', '/')
-
             if len(configure_dir_relpath) > 0 and configure_dir_relpath != '.':
               is_cmd_dir_in_project_path_list = False
               for project_path in project_path_list:
@@ -222,27 +222,37 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
     ret = 0
 
+    configure_all_dirs = []
     for dirpath, dirs, files in os.walk(configure_dir):
-      for dir in dirs:
-        dir_str = str(dir)
+      configure_all_dirs.append((dirpath, list(dirs), files))
+      dirs.clear() # not recursively
 
-        # ignore specific directories
-        if dir_str.startswith('.'):
-          continue
+    traversed_cmd_dirs = set()
 
-        nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
+    for project_path in all_project_paths_ordered_dict.keys():
+      is_cmdop_dir_in_project_path_list = False
 
-        configure_dir_relpath = os.path.relpath(nested_cmd_dir, CONFIGURE_ROOT).replace('\\', '/')
+      for dirpath, dirs, files in configure_all_dirs:
+        for dir in dirs:
+          dir_str = str(dir)
 
-        is_cmdop_dir_in_project_path_list = False
-        for project_path in all_project_paths_set:
-          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/')
+          # ignore specific directories
+          if dir_str.startswith('.'):
+            continue
+
+          nested_cmd_dir = os.path.join(dirpath, dir).replace('\\', '/')
+          if nested_cmd_dir in traversed_cmd_dirs:
+            continue
+
+          is_cmdop_dir_in_project_path_list = tkl.is_file_path_beginswith(project_path + '/', configure_dir_relpath + '/' + dir + '/')
           if is_cmdop_dir_in_project_path_list:
             break
 
-        if not is_cmdop_dir_in_project_path_list:
-          continue
+        if is_cmdop_dir_in_project_path_list:
+          break
 
+      if is_cmdop_dir_in_project_path_list:
+        traversed_cmd_dirs.add(nested_cmd_dir)
         nested_ret = configure(nested_cmd_dir, shell_ext, bare_args,
           generate_project_yaml = generate_project_yaml,
           generate_git_repos_list = generate_git_repos_list,
@@ -251,8 +261,6 @@ def configure(configure_dir, shell_ext, bare_args, generate_project_yaml = False
 
         if nested_ret:
           ret |= 2
-
-      dirs.clear() # not recursively
 
     if yaml_environ_vars_pushed:
       # remove previously added variables and restore previously changed variable values
