@@ -769,7 +769,7 @@ Issue #1:
 
 Solution:
 
-  Carefully read the `SSH+SVN/PLINK SETUP` section to fix most of the cases.
+  Carefully read the `ssh+svn/plink setup` section to fix most of the cases.
 
 Issue #2
 
@@ -835,9 +835,9 @@ Issue #3:
 
 Solution:
 
-  Read the deatils in the `SSH+SVN/PLINK SETUP` section.
+  Read the deatils in the `ssh+svn/plink setup` section.
 
 -------------------------------------------------------------------------------
-13. AUTHOR
+14. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
