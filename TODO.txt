@@ -1,0 +1,5 @@
+* `svn~*~backup_db.*` and `git~*~backup_db` scripts to call `svnadmin dump ...`
+   and `git-fast-export ...` respectively to backup upstream database into
+   local storage (must be addressed separately by variables) and
+   archive it into a 7zip archive with date/time/revision/hash in the file
+   name.

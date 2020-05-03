@@ -1,6 +1,7 @@
 * text=auto !eol
 /README_EN.python_xonsh.known_issues.txt -text
 /README_EN.txt -text
+/TODO.txt -text
 _pyxvcs/01_configure.vars.bat -text
 _pyxvcs/01_configure.vars.sh -text
 _pyxvcs/02_configure.private.bat -text
