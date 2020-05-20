@@ -76,7 +76,7 @@ def cmdop(configure_dir, scm_token, cmd_token, bare_args,
           compare_remote_name = None, compare_svn_rev = None,
           root_only = False, reset_hard = False,
           remove_svn_on_reset = False, cleanup_on_reset = False, cleanup_on_compare = False,
-          verbosity = 0, prune_empty_git_svn_commits = True,
+          verbosity = None, prune_empty_git_svn_commits = True,
           retain_commit_git_svn_parents = False,
           disable_parent_child_ahead_behind_check = False):
   print("cmdop: {0} {1}: entering `{2}`".format(scm_token, cmd_token, configure_dir))
@@ -372,7 +372,8 @@ if __name__ == '__main__':
   arg_parser.add_argument('--remove_svn_on_reset', action = 'store_true')               # remove svn cache in `git_reset` function
   arg_parser.add_argument('--cleanup_on_reset', action = 'store_true')                  # use `git clean -d -f` call in `git_reset` function (boolean)
   arg_parser.add_argument('--cleanup_on_compare', action = 'store_true')                # use `git clean -d -f` call in `git_svn_compare_commits` function (boolean)
-  arg_parser.add_argument('-v', type = int, default = 0)                                # verbosity level: 0 - default, 1 - show environment variables upon call to executables
+  arg_parser.add_argument('-v', type = int, default = None)                             # verbosity level: None - defined by VERBOSITY_LEVEL variable,
+                                                                                        #   where:0 - normal, 1 - show environment variables upon call to executables
   arg_parser.add_argument('--no_prune_empty', action = 'store_true')                    # not prune empty git-svn commits as by default (boolean)
   arg_parser.add_argument('--compare_remote_name', type = str, default = None)          # compare repository associated with a particular remote name (string)
   arg_parser.add_argument('--compare_svn_rev', type = str, default = None)              # compare a particular svn revision (string)
