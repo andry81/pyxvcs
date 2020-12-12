@@ -1,5 +1,5 @@
 2020.12.12:
-* new: license file
+* new: markdown readme with links
 
 2020.05.20:
 * changed: _common: use global VERBOSITY_LEVEL variable by default if the verbosity per function is not set
