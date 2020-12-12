@@ -1,5 +1,6 @@
 * text=auto !eol
 .github/FUNDING.yml -text
+/README.md -text
 /README_EN.python_xonsh.known_issues.txt -text
 /README_EN.txt -text
 /TODO.txt -text
